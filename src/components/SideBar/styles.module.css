@@ -1,0 +1,7 @@
+.side-bar-container {
+  @apply hidden sm:flex flex-col items-center xl:items-start xl:w-[340px] p-2 fixed h-full;
+}
+
+.logo-container {
+  @apply flex items-center justify-center w-14 h-14 p-0 xl:ml-24 hover-animation;
+}
