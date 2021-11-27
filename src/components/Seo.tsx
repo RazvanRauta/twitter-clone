@@ -3,14 +3,12 @@ import { useRouter } from 'next/router';
 
 import { openGraph } from '@/lib/helper';
 
-// !STARTERCONF Change these default meta
 const defaultMeta = {
-  title: 'Next.js + Tailwind CSS + TypeScript Starter',
-  siteName: 'Next.js + Tailwind CSS + TypeScript Starter',
-  description:
-    'A starter for Next.js, Tailwind CSS, and TypeScript with Absolute Import, Seo, Link component, pre-configured with Husky',
-  url: 'https://tsnext-tw.thcl.dev',
-  image: 'https://theodorusclarence.com/favicon/large-og.jpg',
+  title: 'Twitter Clone with Next.js + Tailwind CSS + TypeScript',
+  siteName: 'Twitter Clone with Next.js + Tailwind CSS + TypeScript',
+  description: 'A Twitter Clone with Next.js + Tailwind CSS + TypeScript',
+  url: 'https://twitter.rrazvan.dev',
+  image: '',
   type: 'website',
   robots: 'follow, index',
 };
@@ -65,11 +63,7 @@ export default function Seo(props: SeoProps) {
             property='og:publish_date'
             content={meta.date}
           />
-          <meta
-            name='author'
-            property='article:author'
-            content='Theodorus Clarence'
-          />
+          <meta name='author' property='article:author' content='RRazvan' />
         </>
       )}
 
