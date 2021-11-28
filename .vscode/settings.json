@@ -5,6 +5,5 @@
   "editor.codeActionsOnSave": {
     "source.fixAll": true
   },
-  "prettier.configPath": ".prettierrc.js",
-  "cssModules.camelCase": true
+  "prettier.configPath": ".prettierrc.js"
 }

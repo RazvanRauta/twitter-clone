@@ -1,0 +1,13 @@
+/**
+ *  @author: Razvan Rauta
+ *  Date: Nov 28 2021
+ *  Time: 16:33
+ */
+
+.side-bar-link {
+  @apply text-[#d9d9d9] flex items-center justify-center xl:justify-start text-xl space-x-3 hover-animation;
+}
+
+.side-bar-link.active {
+  @apply font-bold;
+}
