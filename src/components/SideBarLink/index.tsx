@@ -6,9 +6,12 @@
 
 import clsx from 'clsx';
 import { useRouter } from 'next/router';
-import React, { ReactElement } from 'react';
+import type { ReactElement } from 'react';
+import React from 'react';
 
 import styles from './styles.module.css';
+
+import type { ISideBarLink } from '@/types';
 
 interface ISideBarLinkProps {
   active?: boolean;
@@ -25,7 +28,7 @@ export default function SideBarLink({
       className={clsx(styles['side-bar-link'], active && styles.active)}
       onClick={() => active && router.push('/')}
     >
-      <Icon className='h-7' />
+      <Icon size='26px' />
       <span className='hidden xl:inline'>{text}</span>
     </div>
   );

@@ -5,13 +5,16 @@
  */
 
 import noop from 'lodash/noop';
-import React, { ReactElement } from 'react';
+import type { ReactElement } from 'react';
+import React from 'react';
 import { HiOutlineDotsHorizontal } from 'react-icons/hi';
 
 import styles from './styles.module.css';
 
 import NextImage from '../NextImage';
 import SideBarLink from '../SideBarLink';
+
+import type { SideBarLinks } from '@/types';
 
 interface ISideBarProps {
   sideBarLinks: SideBarLinks;
