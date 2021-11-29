@@ -12,3 +12,20 @@ export interface ISideBarLink {
 }
 
 export type SideBarLinks = ISideBarLink[];
+
+export interface ITrendingResult {
+  heading: string;
+  description: string;
+  img: string;
+  tags: string[];
+}
+
+export type TrendingResults = ITrendingResult[];
+
+export interface IFollowerResult {
+  userImg: string;
+  username: string;
+  tag: string;
+}
+
+export type FollowerResults = IFollowerResult[];
