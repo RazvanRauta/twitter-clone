@@ -4,8 +4,7 @@
  *  Time: 18:48
  */
 
-import noop from 'lodash/noop';
-import { useSession } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 import type { ReactElement } from 'react';
 import React from 'react';
 import { HiOutlineDotsHorizontal } from 'react-icons/hi';
@@ -54,7 +53,10 @@ export default function SideBar({ sideBarLinks }: ISideBarProps): ReactElement {
           ))}
       </div>
       <button className={styles['tweet-button']}>Tweet</button>
-      <div className={styles['profile-details-container']} onClick={() => noop}>
+      <div
+        className={styles['profile-details-container']}
+        onClick={() => signOut()}
+      >
         <NextImage
           src={session?.user?.image || ''}
           alt='User Image'
