@@ -1,9 +1,17 @@
 /* eslint-disable @next/next/no-img-element */
+import {
+  addDoc,
+  collection,
+  doc,
+  serverTimestamp,
+  updateDoc,
+} from '@firebase/firestore';
+import { getDownloadURL, ref, uploadString } from '@firebase/storage';
 import clsx from 'clsx';
 import type { EmojiData } from 'emoji-mart';
 import { Picker } from 'emoji-mart';
-import noop from 'lodash/noop';
 import toString from 'lodash/toString';
+import { signOut, useSession } from 'next-auth/react';
 import { ReactElement, SyntheticEvent, useCallback } from 'react';
 import React, { useRef, useState } from 'react';
 import {
@@ -17,11 +25,16 @@ import {
 import 'emoji-mart/css/emoji-mart.css';
 import styles from './styles.module.css';
 
+import { db, storage } from '@/lib/firebase';
 import useOnClickOutside from '@/lib/useOnClickOutside';
 
 import NextImage from '../NextImage';
 
+import { ICustomSession } from '@/types';
+
 export default function AddTweet(): ReactElement {
+  const { data: session } = useSession();
+  const customSession = session as ICustomSession;
   const [input, setInput] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
@@ -54,7 +67,36 @@ export default function AddTweet(): ReactElement {
 
   const sendPost = async () => {
     if (loading) return;
+    if (!customSession?.user) return;
+
     setLoading(true);
+
+    const docRef = await addDoc(collection(db, 'posts'), {
+      id: customSession.user?.uid,
+      username: customSession.user?.name,
+      userImg: customSession.user?.image,
+      tag: customSession.user?.tag,
+      text: input,
+      timestamp: serverTimestamp(),
+    });
+
+    const imageRef = ref(storage, `posts/${docRef.id}/image`);
+
+    if (selectedFile) {
+      try {
+        await uploadString(imageRef, selectedFile, 'data_url').then(
+          async () => {
+            const downloadURL = await getDownloadURL(imageRef);
+            await updateDoc(doc(db, 'posts', docRef.id), {
+              image: downloadURL,
+            });
+          }
+        );
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error(e);
+      }
+    }
 
     setLoading(false);
     setInput('');
@@ -67,13 +109,13 @@ export default function AddTweet(): ReactElement {
       className={clsx(styles['add-tweet-container'], loading && styles.loading)}
     >
       <NextImage
-        src={'https://avatars0.githubusercontent.com/u/40596596?v=4'}
+        src={customSession.user?.image || ''}
         alt='User Image'
         useSkeleton
         imgClassName='rounded-full cursor-pointer'
         width={44}
         height={44}
-        onClick={noop}
+        onClick={() => signOut()}
       />
       <div className='w-full divide-y divide-gray-700'>
         <div className={clsx(selectedFile && 'pb-7', input && 'space-y-2.5')}>
