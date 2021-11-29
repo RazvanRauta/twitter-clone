@@ -1,9 +1,17 @@
 /* eslint-disable @next/next/no-img-element */
+import {
+  addDoc,
+  collection,
+  doc,
+  serverTimestamp,
+  updateDoc,
+} from '@firebase/firestore';
+import { getDownloadURL, ref, uploadString } from '@firebase/storage';
 import clsx from 'clsx';
 import type { EmojiData } from 'emoji-mart';
 import { Picker } from 'emoji-mart';
-import noop from 'lodash/noop';
 import toString from 'lodash/toString';
+import { signOut } from 'next-auth/react';
 import { ReactElement, SyntheticEvent, useCallback } from 'react';
 import React, { useRef, useState } from 'react';
 import {
@@ -17,6 +25,7 @@ import {
 import 'emoji-mart/css/emoji-mart.css';
 import styles from './styles.module.css';
 
+import { db, storage } from '@/lib/firebase';
 import useOnClickOutside from '@/lib/useOnClickOutside';
 
 import NextImage from '../NextImage';
@@ -54,7 +63,35 @@ export default function AddTweet(): ReactElement {
 
   const sendPost = async () => {
     if (loading) return;
+
     setLoading(true);
+
+    const docRef = await addDoc(collection(db, 'posts'), {
+      // id: session.user?.uid,
+      // username: session.user?.name,
+      // userImg: session.user?.image,
+      // tag: session.user?.tag,
+      text: input,
+      timestamp: serverTimestamp(),
+    });
+
+    const imageRef = ref(storage, `posts/${docRef.id}/image`);
+
+    if (selectedFile) {
+      try {
+        await uploadString(imageRef, selectedFile, 'data_url').then(
+          async () => {
+            const downloadURL = await getDownloadURL(imageRef);
+            await updateDoc(doc(db, 'posts', docRef.id), {
+              image: downloadURL,
+            });
+          }
+        );
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error(e);
+      }
+    }
 
     setLoading(false);
     setInput('');
@@ -73,7 +110,7 @@ export default function AddTweet(): ReactElement {
         imgClassName='rounded-full cursor-pointer'
         width={44}
         height={44}
-        onClick={noop}
+        onClick={() => signOut()}
       />
       <div className='w-full divide-y divide-gray-700'>
         <div className={clsx(selectedFile && 'pb-7', input && 'space-y-2.5')}>
