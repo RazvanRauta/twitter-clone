@@ -1,5 +1,6 @@
 import clsx from 'clsx';
-import Image, { ImageProps } from 'next/image';
+import type { ImageProps } from 'next/image';
+import Image from 'next/image';
 import * as React from 'react';
 
 type NextImageProps = {
@@ -7,8 +8,8 @@ type NextImageProps = {
   imgClassName?: string;
   blurClassName?: string;
   alt: string;
-  width: string | number;
-  height: string | number;
+  width?: string | number;
+  height?: string | number;
 } & ImageProps;
 
 /**
@@ -25,6 +26,7 @@ export default function NextImage({
   className,
   imgClassName,
   blurClassName,
+  layout,
   ...rest
 }: NextImageProps) {
   const [status, setStatus] = React.useState(
@@ -40,7 +42,7 @@ export default function NextImage({
       <Image
         className={clsx(
           // text-gray to hide alt text
-          'bg-gray-400 text-gray-400 ',
+          'bg-black text-black',
           imgClassName,
           status === 'loading' && clsx('animate-pulse', blurClassName)
         )}
@@ -49,7 +51,7 @@ export default function NextImage({
         height={height}
         alt={alt}
         onLoadingComplete={() => setStatus('complete')}
-        layout='responsive'
+        layout={layout ?? 'responsive'}
         {...rest}
       />
     </figure>

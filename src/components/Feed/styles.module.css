@@ -1,0 +1,15 @@
+.feed-container {
+  @apply flex-grow border-l border-r border-gray-700 max-w-2xl sm:ml-[73px] xl:ml-[370px];
+}
+
+.home-container {
+  @apply text-[#d9d9d9] flex items-center sm:justify-between py-2 px-3 sticky top-0 z-50 bg-black border-b border-gray-700;
+}
+
+.home-title {
+  @apply text-lg font-bold sm:text-xl;
+}
+
+.sparkles-container {
+  @apply flex items-center justify-center ml-auto hover-animation w-9 h-9 xl:px-0;
+}

@@ -15,6 +15,8 @@ import {
   HiOutlineUser,
 } from 'react-icons/hi';
 
+import type { SideBarLinks } from '@/types';
+
 export const sideBarLinks: SideBarLinks = [
   {
     text: 'Home',
