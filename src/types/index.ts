@@ -3,8 +3,8 @@
  * @ Date: Nov 28 2021
  * @ Time: 16:35
  */
-
-import { IconType } from 'react-icons/lib';
+import { DefaultSession, Session } from 'next-auth';
+import type { IconType } from 'react-icons/lib';
 
 export interface ISideBarLink {
   Icon: IconType;
@@ -29,3 +29,15 @@ export interface IFollowerResult {
 }
 
 export type FollowerResults = IFollowerResult[];
+
+export type CustomUser = {
+  name?: string | null;
+  email?: string | null;
+  image?: string | null;
+  tag?: string | null;
+  uid?: string | null;
+};
+
+export interface ICustomSession extends Session, DefaultSession {
+  user?: CustomUser;
+}
