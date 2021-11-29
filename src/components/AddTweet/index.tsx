@@ -11,7 +11,7 @@ import clsx from 'clsx';
 import type { EmojiData } from 'emoji-mart';
 import { Picker } from 'emoji-mart';
 import toString from 'lodash/toString';
-import { signOut } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 import { ReactElement, SyntheticEvent, useCallback } from 'react';
 import React, { useRef, useState } from 'react';
 import {
@@ -30,7 +30,11 @@ import useOnClickOutside from '@/lib/useOnClickOutside';
 
 import NextImage from '../NextImage';
 
+import { ICustomSession } from '@/types';
+
 export default function AddTweet(): ReactElement {
+  const { data: session } = useSession();
+  const customSession = session as ICustomSession;
   const [input, setInput] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
@@ -63,14 +67,15 @@ export default function AddTweet(): ReactElement {
 
   const sendPost = async () => {
     if (loading) return;
+    if (!customSession?.user) return;
 
     setLoading(true);
 
     const docRef = await addDoc(collection(db, 'posts'), {
-      // id: session.user?.uid,
-      // username: session.user?.name,
-      // userImg: session.user?.image,
-      // tag: session.user?.tag,
+      id: customSession.user?.uid,
+      username: customSession.user?.name,
+      userImg: customSession.user?.image,
+      tag: customSession.user?.tag,
       text: input,
       timestamp: serverTimestamp(),
     });
@@ -104,7 +109,7 @@ export default function AddTweet(): ReactElement {
       className={clsx(styles['add-tweet-container'], loading && styles.loading)}
     >
       <NextImage
-        src={'https://avatars0.githubusercontent.com/u/40596596?v=4'}
+        src={customSession.user?.image || ''}
         alt='User Image'
         useSkeleton
         imgClassName='rounded-full cursor-pointer'
