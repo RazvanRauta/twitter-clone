@@ -11,7 +11,7 @@ import clsx from 'clsx';
 import type { EmojiData } from 'emoji-mart';
 import { Picker } from 'emoji-mart';
 import toString from 'lodash/toString';
-import { signOut, useSession } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import { ReactElement, SyntheticEvent, useCallback } from 'react';
 import React, { useRef, useState } from 'react';
 import {
@@ -115,7 +115,6 @@ export default function AddTweet(): ReactElement {
         imgClassName='rounded-full cursor-pointer'
         width={44}
         height={44}
-        onClick={() => signOut()}
       />
       <div className='w-full divide-y divide-gray-700'>
         <div className={clsx(selectedFile && 'pb-7', input && 'space-y-2.5')}>
@@ -133,7 +132,7 @@ export default function AddTweet(): ReactElement {
                 className={styles['remove-selected-files']}
                 onClick={() => setSelectedFile(null)}
               >
-                <HiOutlineX className='h-5 text-white' />
+                <HiOutlineX size='20px' className='text-white ' />
               </div>
               <img
                 src={selectedFile}

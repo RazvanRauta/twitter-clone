@@ -4,8 +4,7 @@
  *  Time: 18:48
  */
 
-import noop from 'lodash/noop';
-import { useSession } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 import type { ReactElement } from 'react';
 import React from 'react';
 import { HiOutlineDotsHorizontal } from 'react-icons/hi';
@@ -54,7 +53,10 @@ export default function SideBar({ sideBarLinks }: ISideBarProps): ReactElement {
           ))}
       </div>
       <button className={styles['tweet-button']}>Tweet</button>
-      <div className={styles['profile-details-container']} onClick={() => noop}>
+      <div
+        className={styles['profile-details-container']}
+        onClick={() => signOut()}
+      >
         <NextImage
           src={session?.user?.image || ''}
           alt='User Image'
@@ -68,7 +70,10 @@ export default function SideBar({ sideBarLinks }: ISideBarProps): ReactElement {
           <h4 className='font-bold'>{session?.user?.name || 'Username'}</h4>
           <p className='text-[#6e767d]'>@{tag}</p>
         </div>
-        <HiOutlineDotsHorizontal className='hidden h-5 ml-10 xl:inline' />
+        <HiOutlineDotsHorizontal
+          size='20px'
+          className='hidden ml-10 xl:inline'
+        />
       </div>
     </div>
   );
