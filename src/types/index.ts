@@ -3,6 +3,7 @@
  * @ Date: Nov 28 2021
  * @ Time: 16:35
  */
+import { DocumentData, Timestamp } from '@firebase/firestore';
 import { DefaultSession, Session } from 'next-auth';
 import type { IconType } from 'react-icons/lib';
 
@@ -41,3 +42,15 @@ export type CustomUser = {
 export interface ICustomSession extends Session, DefaultSession {
   user?: CustomUser;
 }
+
+export interface ITweet extends DocumentData {
+  text: string;
+  image?: string;
+  timestamp: Timestamp;
+  id: string;
+  tag: string;
+  userImg?: string;
+  username: string;
+}
+
+export type Tweets = ITweet[];
