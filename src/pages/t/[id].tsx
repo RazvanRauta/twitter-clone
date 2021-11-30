@@ -4,25 +4,21 @@
  *  Time: 12:07
  */
 
+import type { QueryDocumentSnapshot } from '@firebase/firestore';
 import {
   collection,
   doc,
   onSnapshot,
   orderBy,
   query,
-  QueryDocumentSnapshot,
 } from '@firebase/firestore';
-import { GetServerSideProps } from 'next';
+import type { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
-import { BuiltInProviderType } from 'next-auth/providers';
-import {
-  ClientSafeProvider,
-  getProviders,
-  getSession,
-  LiteralUnion,
-  useSession,
-} from 'next-auth/react';
-import React, { ReactElement, useEffect, useState } from 'react';
+import type { BuiltInProviderType } from 'next-auth/providers';
+import type { ClientSafeProvider, LiteralUnion } from 'next-auth/react';
+import { getProviders, getSession, useSession } from 'next-auth/react';
+import type { ReactElement } from 'react';
+import React, { useEffect, useState } from 'react';
 import { HiArrowLeft as ArrowLeftIcon } from 'react-icons/hi';
 
 import { db } from '@/lib/firebase';
@@ -40,7 +36,12 @@ import { Widgets } from '@/components/Widgets';
 import { sideBarLinks } from '@/constants';
 import { isModalOpen } from '@/store/modal/modalSlice';
 
-import { FollowerResults, IComment, ITweet, TrendingResults } from '@/types';
+import type {
+  FollowerResults,
+  IComment,
+  ITweet,
+  TrendingResults,
+} from '@/types';
 
 interface TweetProps {
   trendingResults: TrendingResults;

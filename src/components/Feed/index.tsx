@@ -3,14 +3,10 @@
  *  Date: Nov 28 2021
  *  Time: 20:37
  */
-import {
-  collection,
-  onSnapshot,
-  orderBy,
-  query,
-  QueryDocumentSnapshot,
-} from '@firebase/firestore';
-import { ReactElement, useEffect, useState } from 'react';
+import type { QueryDocumentSnapshot } from '@firebase/firestore';
+import { collection, onSnapshot, orderBy, query } from '@firebase/firestore';
+import type { ReactElement } from 'react';
+import { useEffect, useState } from 'react';
 import React from 'react';
 import { HiOutlineSparkles } from 'react-icons/hi';
 
@@ -21,7 +17,7 @@ import { db } from '@/lib/firebase';
 import AddTweet from '../AddTweet';
 import Post from '../Post';
 
-import { ITweet } from '@/types';
+import type { ITweet } from '@/types';
 
 export default function Feed(): ReactElement {
   const [posts, setPosts] = useState<QueryDocumentSnapshot<ITweet>[]>([]);

@@ -1,4 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
+import type { QueryDocumentSnapshot } from '@firebase/firestore';
 import {
   collection,
   deleteDoc,
@@ -6,7 +7,6 @@ import {
   onSnapshot,
   orderBy,
   query,
-  QueryDocumentSnapshot,
   setDoc,
 } from '@firebase/firestore';
 import formatDistance from 'date-fns/formatDistance';
@@ -32,7 +32,7 @@ import { setModalIsOpen, setModalPostId } from '@/store/modal/modalSlice';
 
 import NextImage from '../NextImage';
 
-import { IComment, ITweet, ITweetLike } from '@/types';
+import type { IComment, ITweet, ITweetLike } from '@/types';
 
 interface PostProps {
   id: string;

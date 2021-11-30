@@ -40,7 +40,7 @@ import {
 
 import NextImage from '../NextImage';
 
-import { ITweet } from '@/types';
+import type { ITweet } from '@/types';
 
 export default function Modal(): ReactElement {
   const { data: session } = useSession();

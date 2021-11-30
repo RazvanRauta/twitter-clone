@@ -4,8 +4,8 @@
  *  Time: 18:28
  */
 
-import { BuiltInProviderType } from 'next-auth/providers';
-import { ClientSafeProvider, LiteralUnion } from 'next-auth/react';
+import type { BuiltInProviderType } from 'next-auth/providers';
+import type { ClientSafeProvider, LiteralUnion } from 'next-auth/react';
 import { signIn } from 'next-auth/react';
 import type { ReactElement } from 'react';
 import React from 'react';

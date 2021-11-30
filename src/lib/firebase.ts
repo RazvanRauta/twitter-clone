@@ -4,7 +4,8 @@
  * @ Time: 16:46
  */
 
-import { FirebaseOptions, getApp, getApps, initializeApp } from 'firebase/app';
+import type { FirebaseOptions } from 'firebase/app';
+import { getApp, getApps, initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 

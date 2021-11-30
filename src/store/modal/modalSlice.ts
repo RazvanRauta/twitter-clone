@@ -4,9 +4,10 @@
  * @ Time: 12:52
  */
 
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import type { PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 
-import { RootState } from '../index';
+import type { RootState } from '../index';
 
 interface IModalState {
   isOpen: boolean;

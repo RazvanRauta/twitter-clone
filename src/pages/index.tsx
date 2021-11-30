@@ -5,14 +5,9 @@
  */
 
 import type { GetServerSideProps } from 'next';
-import { BuiltInProviderType } from 'next-auth/providers';
-import {
-  ClientSafeProvider,
-  getProviders,
-  getSession,
-  LiteralUnion,
-  useSession,
-} from 'next-auth/react';
+import type { BuiltInProviderType } from 'next-auth/providers';
+import type { ClientSafeProvider, LiteralUnion } from 'next-auth/react';
+import { getProviders, getSession, useSession } from 'next-auth/react';
 import type { ReactElement } from 'react';
 import * as React from 'react';
 

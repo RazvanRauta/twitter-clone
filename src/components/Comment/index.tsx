@@ -4,9 +4,9 @@
  *  Time: 12:20
  */
 
-import { DocumentData } from '@firebase/firestore';
 import formatDistance from 'date-fns/formatDistance';
-import React, { ReactElement } from 'react';
+import type { ReactElement } from 'react';
+import React from 'react';
 import {
   HiOutlineChartBar as ChartBarIcon,
   HiOutlineChat as ChatIcon,
@@ -17,8 +17,10 @@ import {
 
 import NextImage from '../NextImage';
 
+import type { IComment } from '@/types';
+
 interface Props {
-  comment: DocumentData;
+  comment: IComment;
 }
 
 export default function Comment({ comment }: Props): ReactElement {

@@ -3,7 +3,7 @@
  * @ Date: Nov 28 2021
  * @ Time: 16:35
  */
-import { DocumentData, Timestamp } from '@firebase/firestore';
+import type { DocumentData, Timestamp } from '@firebase/firestore';
 import type { IconType } from 'react-icons/lib';
 
 export interface ISideBarLink {

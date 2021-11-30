@@ -7,7 +7,7 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Session } from 'next-auth';
 
-import { FireBaseUser } from '.';
+import type { FireBaseUser } from '.';
 
 declare module 'next-auth' {
   interface Session {

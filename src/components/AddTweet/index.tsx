@@ -12,7 +12,8 @@ import type { EmojiData } from 'emoji-mart';
 import { Picker } from 'emoji-mart';
 import toString from 'lodash/toString';
 import { useSession } from 'next-auth/react';
-import { ReactElement, SyntheticEvent, useCallback } from 'react';
+import type { ReactElement, SyntheticEvent } from 'react';
+import { useCallback } from 'react';
 import React, { useRef, useState } from 'react';
 import {
   HiOutlineCalendar,
