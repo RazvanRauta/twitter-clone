@@ -5,16 +5,13 @@
  */
 
 import type { GetServerSideProps } from 'next';
-import { BuiltInProviderType } from 'next-auth/providers';
-import {
-  ClientSafeProvider,
-  getProviders,
-  getSession,
-  LiteralUnion,
-  useSession,
-} from 'next-auth/react';
+import type { BuiltInProviderType } from 'next-auth/providers';
+import type { ClientSafeProvider, LiteralUnion } from 'next-auth/react';
+import { getProviders, getSession, useSession } from 'next-auth/react';
 import type { ReactElement } from 'react';
 import * as React from 'react';
+
+import { useAppSelector } from '@/lib/store-hooks';
 
 import Feed from '@/components/Feed';
 import Layout from '@/components/layout/Layout';
@@ -25,6 +22,7 @@ import SideBar from '@/components/SideBar';
 import { Widgets } from '@/components/Widgets';
 
 import { sideBarLinks } from '@/constants';
+import { isModalOpen } from '@/store/modal/modalSlice';
 
 import type { FollowerResults, TrendingResults } from '@/types';
 
@@ -44,6 +42,8 @@ export default function HomePage({
 }: HomePageProps): ReactElement {
   const { data: session } = useSession();
 
+  const isOpen = useAppSelector(isModalOpen);
+
   if (!session) return <Login providers={providers} />;
 
   return (
@@ -56,7 +56,7 @@ export default function HomePage({
           trendingResults={trendingResults}
           followResults={followResults}
         />
-        <Modal />
+        {isOpen && <Modal />}
       </main>
     </Layout>
   );

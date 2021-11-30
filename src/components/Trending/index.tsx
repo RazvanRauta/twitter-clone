@@ -4,12 +4,13 @@
  *  Time: 12:33
  */
 
-import React, { ReactElement } from 'react';
+import type { ReactElement } from 'react';
+import React from 'react';
 import { HiOutlineDotsHorizontal as DotsHorizontalIcon } from 'react-icons/hi';
 
 import NextImage from '../NextImage';
 
-import { ITrendingResult } from '@/types';
+import type { ITrendingResult } from '@/types';
 
 interface TrendingProps {
   result: ITrendingResult;

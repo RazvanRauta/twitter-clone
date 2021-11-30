@@ -1,9 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
+import type { QueryDocumentSnapshot } from '@firebase/firestore';
 import {
   collection,
   deleteDoc,
   doc,
-  DocumentData,
   onSnapshot,
   orderBy,
   query,
@@ -26,10 +26,13 @@ import {
 } from 'react-icons/hi';
 
 import { db } from '@/lib/firebase';
+import { useAppDispatch } from '@/lib/store-hooks';
+
+import { setModalIsOpen, setModalPostId } from '@/store/modal/modalSlice';
 
 import NextImage from '../NextImage';
 
-import { ICustomSession, ITweet } from '@/types';
+import type { IComment, ITweet, ITweetLike } from '@/types';
 
 interface PostProps {
   id: string;
@@ -38,14 +41,24 @@ interface PostProps {
 }
 
 export default function Post({ id, post, postPage }: PostProps): ReactElement {
-  const { data: sess } = useSession();
+  const { data: session } = useSession();
 
-  const session = sess as ICustomSession;
-
-  const [comments, setComments] = useState<DocumentData[]>([]);
-  const [likes, setLikes] = useState<DocumentData[]>([]);
+  const [comments, setComments] = useState<QueryDocumentSnapshot<IComment>[]>(
+    []
+  );
+  const [likes, setLikes] = useState<QueryDocumentSnapshot<ITweetLike>[]>([]);
   const [liked, setLiked] = useState(false);
   const router = useRouter();
+
+  const dispatch = useAppDispatch();
+
+  const setIsOpen = (val: boolean) => {
+    dispatch(setModalIsOpen(val));
+  };
+
+  const setPostId = (id: string) => {
+    dispatch(setModalPostId(id));
+  };
 
   useEffect(
     () =>
@@ -54,16 +67,20 @@ export default function Post({ id, post, postPage }: PostProps): ReactElement {
           collection(db, 'posts', id, 'comments'),
           orderBy('timestamp', 'desc')
         ),
-        (snapshot) => setComments(snapshot.docs)
+        (snapshot) => {
+          const comments = snapshot.docs as QueryDocumentSnapshot<IComment>[];
+          setComments(comments);
+        }
       ),
     [id]
   );
 
   useEffect(
     () =>
-      onSnapshot(collection(db, 'posts', id, 'likes'), (snapshot) =>
-        setLikes(snapshot.docs)
-      ),
+      onSnapshot(collection(db, 'posts', id, 'likes'), (snapshot) => {
+        const likes = snapshot.docs as QueryDocumentSnapshot<ITweetLike>[];
+        setLikes(likes);
+      }),
     [id]
   );
 
@@ -169,8 +186,8 @@ export default function Post({ id, post, postPage }: PostProps): ReactElement {
             className='flex items-center space-x-1 group'
             onClick={(e) => {
               e.stopPropagation();
-              // setPostId(id);
-              // setIsOpen(true);
+              setPostId(id);
+              setIsOpen(true);
             }}
           >
             <div className='icon group-hover:bg-[#1d9bf0] group-hover:bg-opacity-10'>
