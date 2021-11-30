@@ -1,0 +1,85 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model CommentLike {
+  id        String @id @default(cuid())
+  commentId String @map("comment_id")
+
+  comment Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@map("commentLikes")
+}
+
+model Like {
+  id      String @id @default(cuid())
+  userId  String @map("user_id")
+  tweetId String @map("tweet_id")
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tweet Tweet @relation(fields: [tweetId], references: [id], onDelete: Cascade)
+
+  @@map("likes")
+}
+
+model Comment {
+  id           String        @id @default(cuid())
+  userId       String        @map("user_id")
+  tweetId      String        @map("tweet_id")
+  comment      String        @db.VarChar
+  timestamp    DateTime      @default(now()) @db.Timestamptz(6)
+  commentLikes CommentLike[]
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tweet Tweet @relation(fields: [tweetId], references: [id], onDelete: Cascade)
+
+  @@map("comments")
+}
+
+model Tweet {
+  id        String    @id @default(cuid())
+  text      String    @db.VarChar
+  image     String?   @db.VarChar
+  userId    String    @map("user_id")
+  timestamp DateTime  @default(now()) @db.Timestamptz(6)
+  comments  Comment[]
+  likes     Like[]
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("tweets")
+}
+
+model User {
+  id       String    @id @default(cuid())
+  username String    @db.VarChar
+  email    String    @unique @db.VarChar
+  image    String?   @db.VarChar
+  tag      String    @db.VarChar
+  tweets   Tweet[]
+  comments Comment[]
+  likes    Like[]
+  sessions Session[]
+
+
+
+  @@map("users")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}

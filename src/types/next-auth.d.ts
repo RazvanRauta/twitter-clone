@@ -4,13 +4,11 @@
  * @ Time: 13:07
  */
 
+import type Prisma from '@prisma/client';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Session } from 'next-auth';
-
-import type { FireBaseUser } from '.';
-
 declare module 'next-auth' {
   interface Session {
-    user: FireBaseUser;
+    user: Prisma.User;
   }
 }

@@ -1,16 +1,20 @@
-import type { Session } from 'next-auth';
+/**
+ * @ @author: Razvan Rauta
+ * @ Date: Nov 30 2021
+ * @ Time: 10:42
+ */
+
+import { PrismaAdapter } from '@next-auth/prisma-adapter';
+import { PrismaClient } from '@prisma/client';
 import NextAuth from 'next-auth';
-import type { JWT } from 'next-auth/jwt';
 import GoogleProvider from 'next-auth/providers/google';
 
-interface ISessionParams {
-  session: Session;
-  token: JWT;
-}
+const prisma = new PrismaClient();
 
 export default NextAuth({
   // Configure one or more authentication providers
   secret: process.env.NEXTAUTH_SECRET,
+  adapter: PrismaAdapter(prisma),
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
@@ -18,17 +22,4 @@ export default NextAuth({
     }),
     // ...add more providers here
   ],
-  callbacks: {
-    async session({ session, token }: ISessionParams) {
-      if (session && session.user) {
-        session.user.tag = (session.user.name || '')
-          .split(' ')
-          .join('')
-          .toLocaleLowerCase();
-        session.user.uid = token.sub || '';
-      }
-
-      return session;
-    },
-  },
 });
