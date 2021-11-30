@@ -1,6 +1,11 @@
 {
-  "name": "ts-nextjs-tailwind-starter",
-  "version": "0.1.0",
+  "name": "twitter-clone",
+  "version": "1.0.0",
+  "author": {
+    "name": "RRazvan",
+    "email": "razvan@rrazvan.dev",
+    "url": "https://rrazvan.dev"
+  },
   "private": true,
   "scripts": {
     "dev": "next dev",

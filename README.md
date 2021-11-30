@@ -1,5 +1,14 @@
 # Twitter Clone with Next.js + Tailwind CSS + TypeScript
 
+<img src="./demo/demo.png" width="600" >
+
+## Install
+
+* run `yarn` in root directory
+* make a copy of [.env.local.example](./.env.local.example) to `.env.local`
+* add the required Env Variables
+* to start on local dev run: `yarn dev`
+
 ## Usage Guide
 
 ### 1. Change defaults
