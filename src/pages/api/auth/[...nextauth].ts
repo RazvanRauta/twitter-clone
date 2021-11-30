@@ -1,11 +1,9 @@
-import NextAuth from 'next-auth';
+import NextAuth, { Session } from 'next-auth';
 import { JWT } from 'next-auth/jwt';
 import GoogleProvider from 'next-auth/providers/google';
 
-import { ICustomSession } from '@/types';
-
 interface ISessionParams {
-  session: ICustomSession;
+  session: Session;
   token: JWT;
 }
 

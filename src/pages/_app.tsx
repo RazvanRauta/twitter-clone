@@ -4,7 +4,7 @@
  *  Time: 21:29
  */
 
-import type { AppProps as NextAppProps } from 'next/app';
+import type { AppProps } from 'next/app';
 import { SessionProvider } from 'next-auth/react';
 import { Provider } from 'react-redux';
 
@@ -12,23 +12,7 @@ import '@/styles/globals.css';
 
 import { store } from '@/store';
 
-import { ICustomSession } from '@/types';
-
-/**
- * * Enable custom page props
- */
-type AppProps<P = Record<string, unknown>> = {
-  pageProps: P;
-} & Omit<NextAppProps<P>, 'pageProps'>;
-
-type CustomPageProps = {
-  session?: ICustomSession;
-};
-
-function MyApp({
-  Component,
-  pageProps: { session, ...pageProps },
-}: AppProps<CustomPageProps>) {
+function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
   return (
     <Provider store={store}>
       <SessionProvider session={session}>

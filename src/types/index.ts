@@ -4,7 +4,6 @@
  * @ Time: 16:35
  */
 import { DocumentData, Timestamp } from '@firebase/firestore';
-import { DefaultSession, Session } from 'next-auth';
 import type { IconType } from 'react-icons/lib';
 
 export interface ISideBarLink {
@@ -31,17 +30,13 @@ export interface IFollowerResult {
 
 export type FollowerResults = IFollowerResult[];
 
-export type CustomUser = {
+export type FireBaseUser = {
   name?: string | null;
   email?: string | null;
   image?: string | null;
   tag?: string | null;
   uid?: string | null;
 };
-
-export interface ICustomSession extends Session, DefaultSession {
-  user?: CustomUser;
-}
 
 export interface ITweet extends DocumentData {
   text: string;
