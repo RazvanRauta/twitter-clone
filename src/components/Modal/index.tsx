@@ -8,7 +8,6 @@ import {
   addDoc,
   collection,
   doc,
-  DocumentData,
   onSnapshot,
   serverTimestamp,
 } from '@firebase/firestore';
@@ -41,11 +40,13 @@ import {
 
 import NextImage from '../NextImage';
 
+import { ITweet } from '@/types';
+
 export default function Modal(): ReactElement {
   const { data: session } = useSession();
   const postId = useAppSelector(getModalPostId);
   const isOpen = useAppSelector(isModalOpen);
-  const [post, setPost] = useState<DocumentData | undefined>();
+  const [post, setPost] = useState<ITweet | undefined>();
   const [comment, setComment] = useState('');
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -63,7 +64,8 @@ export default function Modal(): ReactElement {
   useEffect(
     () =>
       onSnapshot(doc(db, 'posts', postId || ''), (snapshot) => {
-        setPost(snapshot.data());
+        const post = snapshot.data() as ITweet;
+        setPost(post);
       }),
     [postId]
   );

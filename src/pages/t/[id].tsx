@@ -7,10 +7,10 @@
 import {
   collection,
   doc,
-  DocumentData,
   onSnapshot,
   orderBy,
   query,
+  QueryDocumentSnapshot,
 } from '@firebase/firestore';
 import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
@@ -40,7 +40,7 @@ import { Widgets } from '@/components/Widgets';
 import { sideBarLinks } from '@/constants';
 import { isModalOpen } from '@/store/modal/modalSlice';
 
-import { FollowerResults, ITweet, TrendingResults } from '@/types';
+import { FollowerResults, IComment, ITweet, TrendingResults } from '@/types';
 
 interface TweetProps {
   trendingResults: TrendingResults;
@@ -58,7 +58,9 @@ export default function Tweet({
 }: TweetProps): ReactElement {
   const { data: session } = useSession();
   const [post, setPost] = useState<ITweet>();
-  const [comments, setComments] = useState<DocumentData[]>([]);
+  const [comments, setComments] = useState<QueryDocumentSnapshot<IComment>[]>(
+    []
+  );
   const router = useRouter();
   const isOpen = useAppSelector(isModalOpen);
   const { id } = router.query;
@@ -79,7 +81,10 @@ export default function Tweet({
           collection(db, 'posts', `${id}`, 'comments'),
           orderBy('timestamp', 'desc')
         ),
-        (snapshot) => setComments(snapshot.docs)
+        (snapshot) => {
+          const comments = snapshot.docs as QueryDocumentSnapshot<IComment>[];
+          setComments(comments);
+        }
       ),
     [id]
   );
@@ -105,7 +110,7 @@ export default function Tweet({
           <Post id={`${id}`} post={post} postPage />
           {comments.length > 0 && (
             <div className='pb-72'>
-              {comments.map((comment) => (
+              {comments.map((comment: QueryDocumentSnapshot<IComment>) => (
                 <Comment key={comment.id} comment={comment.data()} />
               ))}
             </div>

@@ -3,10 +3,10 @@ import {
   collection,
   deleteDoc,
   doc,
-  DocumentData,
   onSnapshot,
   orderBy,
   query,
+  QueryDocumentSnapshot,
   setDoc,
 } from '@firebase/firestore';
 import formatDistance from 'date-fns/formatDistance';
@@ -32,7 +32,7 @@ import { setModalIsOpen, setModalPostId } from '@/store/modal/modalSlice';
 
 import NextImage from '../NextImage';
 
-import { ITweet } from '@/types';
+import { IComment, ITweet, ITweetLike } from '@/types';
 
 interface PostProps {
   id: string;
@@ -43,8 +43,10 @@ interface PostProps {
 export default function Post({ id, post, postPage }: PostProps): ReactElement {
   const { data: session } = useSession();
 
-  const [comments, setComments] = useState<DocumentData[]>([]);
-  const [likes, setLikes] = useState<DocumentData[]>([]);
+  const [comments, setComments] = useState<QueryDocumentSnapshot<IComment>[]>(
+    []
+  );
+  const [likes, setLikes] = useState<QueryDocumentSnapshot<ITweetLike>[]>([]);
   const [liked, setLiked] = useState(false);
   const router = useRouter();
 
@@ -65,16 +67,20 @@ export default function Post({ id, post, postPage }: PostProps): ReactElement {
           collection(db, 'posts', id, 'comments'),
           orderBy('timestamp', 'desc')
         ),
-        (snapshot) => setComments(snapshot.docs)
+        (snapshot) => {
+          const comments = snapshot.docs as QueryDocumentSnapshot<IComment>[];
+          setComments(comments);
+        }
       ),
     [id]
   );
 
   useEffect(
     () =>
-      onSnapshot(collection(db, 'posts', id, 'likes'), (snapshot) =>
-        setLikes(snapshot.docs)
-      ),
+      onSnapshot(collection(db, 'posts', id, 'likes'), (snapshot) => {
+        const likes = snapshot.docs as QueryDocumentSnapshot<ITweetLike>[];
+        setLikes(likes);
+      }),
     [id]
   );
 
