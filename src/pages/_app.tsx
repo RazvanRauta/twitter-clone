@@ -6,8 +6,11 @@
 
 import type { AppProps as NextAppProps } from 'next/app';
 import { SessionProvider } from 'next-auth/react';
+import { Provider } from 'react-redux';
 
 import '@/styles/globals.css';
+
+import { store } from '@/store';
 
 import { ICustomSession } from '@/types';
 
@@ -27,9 +30,11 @@ function MyApp({
   pageProps: { session, ...pageProps },
 }: AppProps<CustomPageProps>) {
   return (
-    <SessionProvider session={session}>
-      <Component {...pageProps} />
-    </SessionProvider>
+    <Provider store={store}>
+      <SessionProvider session={session}>
+        <Component {...pageProps} />
+      </SessionProvider>
+    </Provider>
   );
 }
 
