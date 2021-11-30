@@ -70,7 +70,10 @@ export default function SideBar({ sideBarLinks }: ISideBarProps): ReactElement {
           <h4 className='font-bold'>{session?.user?.name || 'Username'}</h4>
           <p className='text-[#6e767d]'>@{tag}</p>
         </div>
-        <HiOutlineDotsHorizontal className='hidden h-5 ml-10 xl:inline' />
+        <HiOutlineDotsHorizontal
+          size='20px'
+          className='hidden ml-10 xl:inline'
+        />
       </div>
     </div>
   );

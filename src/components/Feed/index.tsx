@@ -43,7 +43,7 @@ export default function Feed(): ReactElement {
       <div className={styles['home-container']}>
         <h2 className={styles['home-title']}>Home</h2>
         <div className={styles['sparkles-container']}>
-          <HiOutlineSparkles className='h-5 text-white' />
+          <HiOutlineSparkles size={'20px'} className='text-white' />
         </div>
       </div>
 

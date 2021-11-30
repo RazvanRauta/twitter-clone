@@ -94,7 +94,7 @@ export default function Tweet({
               className='flex items-center justify-center hoverAnimation w-9 h-9 xl:px-0'
               onClick={() => router.push('/')}
             >
-              <ArrowLeftIcon className='h-5 text-white' />
+              <ArrowLeftIcon size='20px' className='text-white ' />
             </div>
             Tweet
           </div>

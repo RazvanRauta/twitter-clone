@@ -146,7 +146,10 @@ export default function Post({ id, post, postPage }: PostProps): ReactElement {
             )}
           </div>
           <div className='flex-shrink-0 ml-auto icon group'>
-            <DotsHorizontalIcon className='h-5 text-[#6e767d] group-hover:text-[#1d9bf0]' />
+            <DotsHorizontalIcon
+              size='20px'
+              className=' text-[#6e767d] group-hover:text-[#1d9bf0]'
+            />
           </div>
         </div>
         {postPage && (
@@ -171,7 +174,7 @@ export default function Post({ id, post, postPage }: PostProps): ReactElement {
             }}
           >
             <div className='icon group-hover:bg-[#1d9bf0] group-hover:bg-opacity-10'>
-              <ChatIcon className='h-5 group-hover:text-[#1d9bf0]' />
+              <ChatIcon size='20px' className=' group-hover:text-[#1d9bf0]' />
             </div>
             {comments.length > 0 && (
               <span className='group-hover:text-[#1d9bf0] text-sm'>
@@ -190,13 +193,16 @@ export default function Post({ id, post, postPage }: PostProps): ReactElement {
               }}
             >
               <div className='icon group-hover:bg-red-600/10'>
-                <TrashIcon className='h-5 group-hover:text-red-600' />
+                <TrashIcon size='20px' className=' group-hover:text-red-600' />
               </div>
             </div>
           ) : (
             <div className='flex items-center space-x-1 group'>
               <div className='icon group-hover:bg-green-500/10'>
-                <SwitchHorizontalIcon className='h-5 group-hover:text-green-500' />
+                <SwitchHorizontalIcon
+                  size='20px'
+                  className=' group-hover:text-green-500'
+                />
               </div>
             </div>
           )}
@@ -210,9 +216,9 @@ export default function Post({ id, post, postPage }: PostProps): ReactElement {
           >
             <div className='icon group-hover:bg-pink-600/10'>
               {liked ? (
-                <HeartIconFilled className='h-5 text-pink-600' />
+                <HeartIconFilled size='20px' className='text-pink-600 ' />
               ) : (
-                <HeartIcon className='h-5 group-hover:text-pink-600' />
+                <HeartIcon size='20px' className=' group-hover:text-pink-600' />
               )}
             </div>
             {likes.length > 0 && (
@@ -227,10 +233,10 @@ export default function Post({ id, post, postPage }: PostProps): ReactElement {
           </div>
 
           <div className='icon group'>
-            <ShareIcon className='h-5 group-hover:text-[#1d9bf0]' />
+            <ShareIcon size='20px' className=' group-hover:text-[#1d9bf0]' />
           </div>
           <div className='icon group'>
-            <ChartBarIcon className='h-5 group-hover:text-[#1d9bf0]' />
+            <ChartBarIcon size='20px' className=' group-hover:text-[#1d9bf0]' />
           </div>
         </div>
       </div>

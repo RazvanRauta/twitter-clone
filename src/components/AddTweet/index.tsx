@@ -132,7 +132,7 @@ export default function AddTweet(): ReactElement {
                 className={styles['remove-selected-files']}
                 onClick={() => setSelectedFile(null)}
               >
-                <HiOutlineX className='h-5 text-white' />
+                <HiOutlineX size='20px' className='text-white ' />
               </div>
               <img
                 src={selectedFile}
