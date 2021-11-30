@@ -14,7 +14,7 @@ import styles from './styles.module.css';
 import NextImage from '../NextImage';
 import SideBarLink from '../SideBarLink';
 
-import type { ICustomSession, SideBarLinks } from '@/types';
+import type { SideBarLinks } from '@/types';
 
 interface ISideBarProps {
   sideBarLinks: SideBarLinks;
@@ -23,12 +23,7 @@ interface ISideBarProps {
 export default function SideBar({ sideBarLinks }: ISideBarProps): ReactElement {
   const { data: session } = useSession();
 
-  let tag = 'user-tag';
-
-  if (session && session.user) {
-    const customSession = session as ICustomSession;
-    tag = customSession?.user?.tag || 'user-tag';
-  }
+  const tag = session?.user?.tag || 'user-tag';
 
   return (
     <div className={styles['side-bar-container']}>

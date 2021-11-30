@@ -29,7 +29,7 @@ import { db } from '@/lib/firebase';
 
 import NextImage from '../NextImage';
 
-import { ICustomSession, ITweet } from '@/types';
+import { ITweet } from '@/types';
 
 interface PostProps {
   id: string;
@@ -38,9 +38,7 @@ interface PostProps {
 }
 
 export default function Post({ id, post, postPage }: PostProps): ReactElement {
-  const { data: sess } = useSession();
-
-  const session = sess as ICustomSession;
+  const { data: session } = useSession();
 
   const [comments, setComments] = useState<DocumentData[]>([]);
   const [likes, setLikes] = useState<DocumentData[]>([]);
