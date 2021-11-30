@@ -26,6 +26,9 @@ import {
 } from 'react-icons/hi';
 
 import { db } from '@/lib/firebase';
+import { useAppDispatch } from '@/lib/store-hooks';
+
+import { setModalIsOpen, setModalPostId } from '@/store/modal/modalSlice';
 
 import NextImage from '../NextImage';
 
@@ -44,6 +47,16 @@ export default function Post({ id, post, postPage }: PostProps): ReactElement {
   const [likes, setLikes] = useState<DocumentData[]>([]);
   const [liked, setLiked] = useState(false);
   const router = useRouter();
+
+  const dispatch = useAppDispatch();
+
+  const setIsOpen = (val: boolean) => {
+    dispatch(setModalIsOpen(val));
+  };
+
+  const setPostId = (id: string) => {
+    dispatch(setModalPostId(id));
+  };
 
   useEffect(
     () =>
@@ -167,8 +180,8 @@ export default function Post({ id, post, postPage }: PostProps): ReactElement {
             className='flex items-center space-x-1 group'
             onClick={(e) => {
               e.stopPropagation();
-              // setPostId(id);
-              // setIsOpen(true);
+              setPostId(id);
+              setIsOpen(true);
             }}
           >
             <div className='icon group-hover:bg-[#1d9bf0] group-hover:bg-opacity-10'>

@@ -167,7 +167,7 @@ export default function AddTweet(): ReactElement {
               <div className='icon'>
                 <HiOutlineCalendar className='text-[#1d9bf0]' size='22px' />
               </div>
-              <div ref={picker} className='absolute'>
+              <div ref={picker} className='absolute z-10'>
                 {showEmojis && (
                   <Picker
                     onSelect={addEmoji}

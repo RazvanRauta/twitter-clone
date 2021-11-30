@@ -5,7 +5,7 @@
  */
 
 import { DocumentData } from '@firebase/firestore';
-import { formatDistance } from 'date-fns';
+import formatDistance from 'date-fns/formatDistance';
 import React, { ReactElement } from 'react';
 import {
   HiOutlineChartBar as ChartBarIcon,

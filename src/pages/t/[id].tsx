@@ -26,6 +26,7 @@ import React, { ReactElement, useEffect, useState } from 'react';
 import { HiArrowLeft as ArrowLeftIcon } from 'react-icons/hi';
 
 import { db } from '@/lib/firebase';
+import { useAppSelector } from '@/lib/store-hooks';
 
 import Comment from '@/components/Comment';
 import Layout from '@/components/layout/Layout';
@@ -37,6 +38,7 @@ import SideBar from '@/components/SideBar';
 import { Widgets } from '@/components/Widgets';
 
 import { sideBarLinks } from '@/constants';
+import { isModalOpen } from '@/store/modal/modalSlice';
 
 import { FollowerResults, ITweet, TrendingResults } from '@/types';
 
@@ -58,6 +60,7 @@ export default function Tweet({
   const [post, setPost] = useState<ITweet>();
   const [comments, setComments] = useState<DocumentData[]>([]);
   const router = useRouter();
+  const isOpen = useAppSelector(isModalOpen);
   const { id } = router.query;
 
   useEffect(
@@ -112,8 +115,7 @@ export default function Tweet({
           trendingResults={trendingResults}
           followResults={followResults}
         />
-
-        <Modal />
+        {isOpen && <Modal />}
       </main>
     </Layout>
   );
