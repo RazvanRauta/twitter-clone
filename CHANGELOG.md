@@ -4,11 +4,10 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 1.0.0 (2021-12-01)
 
-
 ### Features
 
-* ** comments :** added comments component ([9e8db35](https://github.com/RazvanRauta/twitter-clone/commit/9e8db35f81ccdad846576a96879c94a32c925e71))
-* ** tweet page :** added page for tweet ([9ac99ee](https://github.com/RazvanRauta/twitter-clone/commit/9ac99ee0335af4e920cbb6f7393195fc753c2d53))
+* **comments :** added comments component ([9e8db35](https://github.com/RazvanRauta/twitter-clone/commit/9e8db35f81ccdad846576a96879c94a32c925e71))
+* **tweet page :** added page for tweet ([9ac99ee](https://github.com/RazvanRauta/twitter-clone/commit/9ac99ee0335af4e920cbb6f7393195fc753c2d53))
 * **add tweet:** added the Add Tweet component ([bec9b15](https://github.com/RazvanRauta/twitter-clone/commit/bec9b15b331f3856718e3f97a673521f0ab6dff8))
 * **add tweet:** improved Add Tweet feature ([c080966](https://github.com/RazvanRauta/twitter-clone/commit/c0809667caac3e139f6a30b23b39ecb8a069e318))
 * **auth:** added session ([561a411](https://github.com/RazvanRauta/twitter-clone/commit/561a411917e0bee71a93e70b730567a00cbaef2b))
@@ -26,10 +25,9 @@ All notable changes to this project will be documented in this file. See [standa
 * **tweet post:** added tweet post component ([2163471](https://github.com/RazvanRauta/twitter-clone/commit/2163471639ac354eca346828137e10afac9f1444))
 * **widgets:** added widgets component ([80c24f9](https://github.com/RazvanRauta/twitter-clone/commit/80c24f97bead92d65be60874b8a3229454fc4fe2))
 
-
 ### Bug Fixes
 
-* ** session types:** fixed session types ([a94b08f](https://github.com/RazvanRauta/twitter-clone/commit/a94b08f02c2d04a6dc6af9da5323f31e5dd2175a))
+* **session types:** fixed session types ([a94b08f](https://github.com/RazvanRauta/twitter-clone/commit/a94b08f02c2d04a6dc6af9da5323f31e5dd2175a))
 * **auth:** remove signout on picture ([9c30110](https://github.com/RazvanRauta/twitter-clone/commit/9c3011051329e16bf390e2518b842a5c755927d7))
 * **code lintters:** added rule for importing of the types ([d15c229](https://github.com/RazvanRauta/twitter-clone/commit/d15c229dbb97dcdc7357ea5cee15e51ca44fd66f))
 * **icons:** fixed icons sizes ([11b4915](https://github.com/RazvanRauta/twitter-clone/commit/11b49151ec0bc5589a36dbfee00909868b5d372c))
