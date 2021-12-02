@@ -18,6 +18,9 @@ declare global {
       GOOGLE_CLIENT_SECRET: string;
       NEXTAUTH_URL: string;
       NEXTAUTH_SECRET: string;
+      AUTH0_CLIENT_ID: string;
+      AUTH0_CLIENT_SECRET: string;
+      AUTH0_ISSUER: string;
     }
   }
 }

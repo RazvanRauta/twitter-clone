@@ -5,16 +5,15 @@
  */
 
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
-import { PrismaClient } from '@prisma/client';
+import * as Prisma from '@prisma/client';
 import NextAuth from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 
-const prisma = new PrismaClient();
+const prisma = new Prisma.PrismaClient();
 
 export default NextAuth({
   // Configure one or more authentication providers
   secret: process.env.NEXTAUTH_SECRET,
-  adapter: PrismaAdapter(prisma),
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
@@ -22,4 +21,17 @@ export default NextAuth({
     }),
     // ...add more providers here
   ],
+  adapter: PrismaAdapter(prisma),
+  callbacks: {
+    async session({ session }) {
+      if (session?.user?.name) {
+        session.user.tag = session.user.name
+          .split(' ')
+          .join('')
+          .toLocaleLowerCase();
+      }
+
+      return session;
+    },
+  },
 });

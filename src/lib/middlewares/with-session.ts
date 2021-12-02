@@ -7,6 +7,8 @@
 import type { NextApiResponse } from 'next/types';
 import { getSession } from 'next-auth/react';
 
+import { sendResponse } from './handle-response';
+
 import type { ApiHandler, NextApiRequestWithUser } from '@/types';
 
 /**
@@ -20,7 +22,10 @@ export const withSession =
       req.user = session.user;
       return handler(req, res);
     } else {
-      res.status(401).json({ message: 'Ups! You need to login first!' });
-      res.end();
+      sendResponse({
+        error: 'Ups! You need to login first!',
+        status: 401,
+        res,
+      });
     }
   };

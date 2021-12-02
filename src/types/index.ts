@@ -70,3 +70,16 @@ export type ApiHandler = (
   req: NextApiRequest,
   res: NextApiResponse
 ) => Promise<void>;
+
+export interface ApiSuccessResponse<T = []> {
+  success: boolean;
+  count: number;
+  data: T | never[];
+}
+
+export interface ApiErrorResponse {
+  success: boolean;
+  error: string;
+}
+
+export type ApiResponse<T = []> = ApiSuccessResponse<T> | ApiErrorResponse;

@@ -1,32 +1,44 @@
+import type { Tweet } from '@prisma/client';
 import { PrismaClient } from '@prisma/client';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import { getSession } from 'next-auth/react';
+import type { NextApiResponse } from 'next';
 
-export default async function createTweet(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
-  const session = await getSession({ req });
+import { sendResponse } from '@/lib/middlewares/handle-response';
+import { withSession } from '@/lib/middlewares/with-session';
+
+import type { NextApiRequestWithUser } from '@/types';
+
+async function handler(req: NextApiRequestWithUser, res: NextApiResponse) {
   const prisma = new PrismaClient();
-
-  if (session) {
+  const user = req.user;
+  if (!user) {
+    sendResponse({
+      error: 'Ups! You need to login first!',
+      status: 401,
+      res,
+    });
+  } else {
     if (req.method === 'POST') {
       const newTweet = await prisma.tweet.create({
         data: {
           text: req.body.text,
           image: req.body.image,
           timestamp: req.body.timestamp,
-          userId: session.user.id,
+          userId: user.id,
         },
       });
-      res.status(201).json(newTweet);
-      res.end();
+      sendResponse<Tweet>({
+        status: 201,
+        data: newTweet,
+        res,
+      });
     } else {
-      res.status(405).json({ message: 'Method Not Allowed' });
-      res.end();
+      sendResponse({
+        status: 405,
+        error: 'Method Not Allowed',
+        res,
+      });
     }
-  } else {
-    res.status(401);
-    res.end();
   }
 }
+
+export default withSession(handler);
