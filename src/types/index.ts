@@ -4,6 +4,8 @@
  * @ Time: 16:35
  */
 import type { DocumentData, Timestamp } from '@firebase/firestore';
+import type Prisma from '@prisma/client';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import type { IconType } from 'react-icons/lib';
 
 export interface ISideBarLink {
@@ -59,3 +61,12 @@ export interface IComment extends DocumentData {
 export interface ITweetLike extends DocumentData {
   username: string;
 }
+
+export interface NextApiRequestWithUser extends NextApiRequest {
+  user?: Prisma.User;
+}
+
+export type ApiHandler = (
+  req: NextApiRequest,
+  res: NextApiResponse
+) => Promise<void>;
