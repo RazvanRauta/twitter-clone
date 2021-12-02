@@ -32,11 +32,11 @@ import { setModalIsOpen, setModalPostId } from '@/store/modal/modalSlice';
 
 import NextImage from '../NextImage';
 
-import type { IComment, ITweet, ITweetLike } from '@/types';
+import type { IComment, ITweetLike, TweetWithUser } from '@/types';
 
 interface PostProps {
   id: string;
-  post?: ITweet;
+  post?: TweetWithUser;
   postPage?: boolean;
 }
 
@@ -86,18 +86,16 @@ export default function Post({ id, post, postPage }: PostProps): ReactElement {
 
   useEffect(
     () =>
-      setLiked(
-        likes.findIndex((like) => like.id === session?.user?.uid) !== -1
-      ),
-    [likes, session?.user?.uid]
+      setLiked(likes.findIndex((like) => like.id === session?.user?.id) !== -1),
+    [likes, session?.user?.id]
   );
 
   const likePost = async () => {
-    if (session?.user?.uid) {
+    if (session?.user?.id) {
       if (liked) {
-        await deleteDoc(doc(db, 'posts', id, 'likes', session?.user?.uid));
+        await deleteDoc(doc(db, 'posts', id, 'likes', session?.user?.id));
       } else {
-        await setDoc(doc(db, 'posts', id, 'likes', session.user.uid), {
+        await setDoc(doc(db, 'posts', id, 'likes', session.user.id), {
           username: session?.user?.name,
         });
       }
@@ -109,9 +107,9 @@ export default function Post({ id, post, postPage }: PostProps): ReactElement {
       className='flex p-3 border-b border-gray-700 cursor-pointer'
       onClick={() => router.push(`/t/${id}`)}
     >
-      {!postPage && post?.userImg && (
+      {!postPage && post?.user && (
         <NextImage
-          src={post.userImg}
+          src={post.user.image || ''}
           alt='Profile Pic'
           className='mr-4'
           imgClassName='rounded-full h-11 w-11'
@@ -121,9 +119,9 @@ export default function Post({ id, post, postPage }: PostProps): ReactElement {
       )}
       <div className='flex flex-col w-full space-y-2'>
         <div className={`flex ${!postPage && 'justify-between'}`}>
-          {postPage && post?.userImg && (
+          {postPage && post?.user && (
             <NextImage
-              src={post?.userImg}
+              src={post.user.image || ''}
               alt='Profile Pic'
               className='mr-4'
               imgClassName='rounded-full h-11 w-11'
@@ -138,19 +136,19 @@ export default function Post({ id, post, postPage }: PostProps): ReactElement {
                   !postPage && 'inline-block'
                 }`}
               >
-                {post?.username}
+                {post?.user.name}
               </h4>
               <span
                 className={`text-sm sm:text-[15px] ${!postPage && 'ml-1.5'}`}
               >
-                @{post?.tag}
+                @{post?.user.tag}
               </span>
             </div>
             ·{' '}
             <span className='hover:underline text-sm sm:text-[15px]'>
               <time>
                 {formatDistance(
-                  new Date(post?.timestamp?.toDate() || Date.now()),
+                  new Date(post?.timestamp || Date.now()),
                   new Date(),
                   { addSuffix: true }
                 )}
@@ -172,11 +170,13 @@ export default function Post({ id, post, postPage }: PostProps): ReactElement {
         {postPage && (
           <p className='text-[#d9d9d9] mt-0.5 text-xl'>{post?.text}</p>
         )}
-        <img
-          src={post?.image}
-          alt=''
-          className='rounded-2xl max-h-[700px] object-cover mr-2'
-        />
+        {post?.image && (
+          <img
+            src={post?.image}
+            alt=''
+            className='rounded-2xl max-h-[700px] object-cover mr-2'
+          />
+        )}
         <div
           className={`text-[#6e767d] flex justify-between w-10/12 ${
             postPage && 'mx-auto'
@@ -200,7 +200,7 @@ export default function Post({ id, post, postPage }: PostProps): ReactElement {
             )}
           </div>
 
-          {session?.user?.uid === post?.id ? (
+          {session?.user?.id === post?.user.id ? (
             <div
               className='flex items-center space-x-1 group'
               onClick={(e) => {

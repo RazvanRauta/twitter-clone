@@ -5,6 +5,7 @@
  */
 import type { DocumentData, Timestamp } from '@firebase/firestore';
 import type Prisma from '@prisma/client';
+import type { Tweet, User } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { IconType } from 'react-icons/lib';
 
@@ -83,3 +84,9 @@ export interface ApiErrorResponse {
 }
 
 export type ApiResponse<T = []> = ApiSuccessResponse<T> | ApiErrorResponse;
+
+export type TweetWithUser = Tweet & {
+  user: User;
+};
+
+export type TweetsWithUser = TweetWithUser[];
