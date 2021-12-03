@@ -5,28 +5,20 @@
  */
 
 import type { QueryDocumentSnapshot } from '@firebase/firestore';
-import {
-  collection,
-  doc,
-  onSnapshot,
-  orderBy,
-  query,
-} from '@firebase/firestore';
-import type { GetServerSideProps } from 'next';
+import { collection, onSnapshot, orderBy, query } from '@firebase/firestore';
+import type { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import { useRouter } from 'next/router';
-import type { BuiltInProviderType } from 'next-auth/providers';
-import type { ClientSafeProvider, LiteralUnion } from 'next-auth/react';
-import { getProviders, getSession, useSession } from 'next-auth/react';
+import { getSession } from 'next-auth/react';
 import type { ReactElement } from 'react';
 import React, { useEffect, useState } from 'react';
 import { HiArrowLeft as ArrowLeftIcon } from 'react-icons/hi';
 
 import { db } from '@/lib/firebase';
 import { useAppSelector } from '@/lib/store-hooks';
+import { withAuth } from '@/lib/with-auth';
 
 import Comment from '@/components/Comment';
 import Layout from '@/components/layout/Layout';
-import { Login } from '@/components/Login';
 import Modal from '@/components/Modal';
 import Post from '@/components/Post';
 import Seo from '@/components/Seo';
@@ -39,26 +31,16 @@ import { isModalOpen } from '@/store/modal/modalSlice';
 import type {
   FollowerResults,
   IComment,
-  ITweet,
   TrendingResults,
+  TweetWithUser,
 } from '@/types';
 
-interface TweetProps {
-  trendingResults: TrendingResults;
-  followResults: FollowerResults;
-  providers: Record<
-    LiteralUnion<BuiltInProviderType, string>,
-    ClientSafeProvider
-  > | null;
-}
-
-export default function Tweet({
+function Tweet({
   followResults,
-  providers,
   trendingResults,
-}: TweetProps): ReactElement {
-  const { data: session } = useSession();
-  const [post, setPost] = useState<ITweet>();
+}: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [post, setPost] = useState<TweetWithUser>();
   const [comments, setComments] = useState<QueryDocumentSnapshot<IComment>[]>(
     []
   );
@@ -66,14 +48,14 @@ export default function Tweet({
   const isOpen = useAppSelector(isModalOpen);
   const { id } = router.query;
 
-  useEffect(
-    () =>
-      onSnapshot(doc(db, 'posts', `${id}`), (snapshot) => {
-        const post = snapshot.data() as ITweet;
-        setPost(post);
-      }),
-    [id]
-  );
+  // useEffect(
+  //   () =>
+  //     onSnapshot(doc(db, 'posts', `${id}`), (snapshot) => {
+  //       const post = snapshot.data() as ITweet;
+  //       setPost(post);
+  //     }),
+  //   [id]
+  // );
 
   useEffect(
     () =>
@@ -90,11 +72,13 @@ export default function Tweet({
     [id]
   );
 
-  if (!session) return <Login providers={providers} />;
+  if (!post) {
+    return <p>No post</p>;
+  }
 
   return (
     <Layout>
-      <Seo templateTitle={`${post?.username} on Twitter: "${post?.text}""`} />
+      <Seo templateTitle={`${post.user.name} on Twitter: "${post?.text}""`} />
       <main className='bg-black min-h-screen flex max-w-[1500px] mx-auto'>
         <SideBar sideBarLinks={[...sideBarLinks]} />
         <div className='flex-grow border-l border-r border-gray-700 max-w-2xl sm:ml-[73px] xl:ml-[370px]'>
@@ -127,21 +111,28 @@ export default function Tweet({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export default withAuth(Tweet);
+
+type GetServerSideCustomProps = {
+  trendingResults: TrendingResults;
+  followResults: FollowerResults;
+};
+
+export const getServerSideProps: GetServerSideProps<
+  GetServerSideCustomProps
+> = async (context) => {
   const trendingResults = await fetch('https://jsonkeeper.com/b/NKEV').then(
     (res) => res.json()
   );
   const followResults = await fetch('https://jsonkeeper.com/b/WWMJ').then(
     (res) => res.json()
   );
-  const providers = await getProviders();
   const session = await getSession(context);
 
   return {
     props: {
       trendingResults,
       followResults,
-      providers,
       session,
     },
   };

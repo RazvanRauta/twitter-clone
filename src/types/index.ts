@@ -6,7 +6,7 @@
 import type { DocumentData, Timestamp } from '@firebase/firestore';
 import type Prisma from '@prisma/client';
 import type { Tweet, User } from '@prisma/client';
-import type { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse, NextPage } from 'next';
 import type { IconType } from 'react-icons/lib';
 
 export interface ISideBarLink {
@@ -90,3 +90,7 @@ export type TweetWithUser = Tweet & {
 };
 
 export type TweetsWithUser = TweetWithUser[];
+
+export type NextApplicationPage<P = unknown, IP = P> = NextPage<P, IP> & {
+  requireAuth?: boolean;
+};

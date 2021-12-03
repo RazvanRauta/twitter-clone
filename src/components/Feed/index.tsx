@@ -15,7 +15,7 @@ import AddTweet from '../AddTweet';
 import Post from '../Post';
 import Spinner from '../Spinner';
 
-import type { TweetsWithUser } from '@/types';
+import type { ApiErrorResponse, TweetsWithUser } from '@/types';
 
 export default function Feed(): ReactElement {
   const { data, isLoading, error } = useGetAllTweetsQuery();
@@ -26,8 +26,10 @@ export default function Feed(): ReactElement {
     posts = data.data;
   }
 
-  if (error) {
-    errorMsj = data && 'error' in data ? data.error : 'Ups! Error...';
+  if (error && 'data' in error) {
+    const { data: datum } = error;
+    const err = datum as ApiErrorResponse;
+    errorMsj = err && 'error' in err ? err.error : 'Ups! Error...';
   }
 
   return (
@@ -44,7 +46,11 @@ export default function Feed(): ReactElement {
         {isLoading && <Spinner />}
         {posts &&
           posts.map((post) => <Post key={post.id} id={post.id} post={post} />)}
-        {errorMsj && <p>{errorMsj}</p>}
+        {errorMsj && !isLoading && (
+          <div className='flex items-center justify-center w-full h-28'>
+            <p className='text-yellow-300'>{errorMsj}</p>
+          </div>
+        )}
       </div>
     </div>
   );
