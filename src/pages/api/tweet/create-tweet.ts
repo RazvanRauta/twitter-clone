@@ -1,11 +1,10 @@
-import type { Tweet } from '@prisma/client';
 import { PrismaClient } from '@prisma/client';
 import type { NextApiResponse } from 'next';
 
 import { sendResponse } from '@/lib/middlewares/handle-response';
 import { withSession } from '@/lib/middlewares/with-session';
 
-import type { NextApiRequestWithUser } from '@/types';
+import type { NextApiRequestWithUser, TweetWithUser } from '@/types';
 
 async function handler(req: NextApiRequestWithUser, res: NextApiResponse) {
   const prisma = new PrismaClient();
@@ -25,8 +24,11 @@ async function handler(req: NextApiRequestWithUser, res: NextApiResponse) {
           timestamp: req.body.timestamp,
           userId: user.id,
         },
+        include: {
+          user: true,
+        },
       });
-      sendResponse<Tweet>({
+      sendResponse<TweetWithUser>({
         status: 201,
         data: newTweet,
         res,
