@@ -6,7 +6,6 @@
 
 import type { FirebaseOptions } from 'firebase/app';
 import { getApp, getApps, initializeApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 
 const firebaseConfig: FirebaseOptions = {
@@ -19,8 +18,7 @@ const firebaseConfig: FirebaseOptions = {
 };
 
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-const db = getFirestore();
 const storage = getStorage();
 
 export default app;
-export { db, storage };
+export { storage };

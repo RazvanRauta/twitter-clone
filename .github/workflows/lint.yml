@@ -59,6 +59,7 @@ jobs:
             ${{ runner.os }}-nextjs-${{ hashFiles('**/yarn.lock') }}
 
       - run: yarn install --frozen-lockfile
+      - run: yarn run prisma:generate
       - run: yarn tsc
 
   prettier:
