@@ -15,11 +15,11 @@ import AddTweet from '../AddTweet';
 import Post from '../Post';
 import Spinner from '../Spinner';
 
-import type { ApiErrorResponse, TweetsWithUser } from '@/types';
+import type { ApiErrorResponse, TweetWithUserAndCount } from '@/types';
 
 export default function Feed(): ReactElement {
   const { data, isLoading, error } = useGetAllTweetsQuery();
-  let posts: TweetsWithUser = [];
+  let posts: TweetWithUserAndCount[] = [];
   let errorMsj = '';
 
   if (data && 'data' in data) {

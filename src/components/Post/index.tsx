@@ -5,8 +5,6 @@ import {
   deleteDoc,
   doc,
   onSnapshot,
-  orderBy,
-  query,
   setDoc,
 } from '@firebase/firestore';
 import formatDistance from 'date-fns/formatDistance';
@@ -32,20 +30,16 @@ import { setModalIsOpen, setModalPostId } from '@/store/modal/modalSlice';
 
 import NextImage from '../NextImage';
 
-import type { IComment, ITweetLike, TweetWithUser } from '@/types';
+import type { ITweetLike, TweetWithUserAndCount } from '@/types';
 
 interface PostProps {
   id: string;
-  post?: TweetWithUser;
+  post?: TweetWithUserAndCount;
   postPage?: boolean;
 }
 
 export default function Post({ id, post, postPage }: PostProps): ReactElement {
   const { data: session } = useSession();
-
-  const [comments, setComments] = useState<QueryDocumentSnapshot<IComment>[]>(
-    []
-  );
   const [likes, setLikes] = useState<QueryDocumentSnapshot<ITweetLike>[]>([]);
   const [liked, setLiked] = useState(false);
   const router = useRouter();
@@ -59,21 +53,6 @@ export default function Post({ id, post, postPage }: PostProps): ReactElement {
   const setPostId = (id: string) => {
     dispatch(setModalPostId(id));
   };
-
-  useEffect(
-    () =>
-      onSnapshot(
-        query(
-          collection(db, 'posts', id, 'comments'),
-          orderBy('timestamp', 'desc')
-        ),
-        (snapshot) => {
-          const comments = snapshot.docs as QueryDocumentSnapshot<IComment>[];
-          setComments(comments);
-        }
-      ),
-    [id]
-  );
 
   useEffect(
     () =>
@@ -136,12 +115,12 @@ export default function Post({ id, post, postPage }: PostProps): ReactElement {
                   !postPage && 'inline-block'
                 }`}
               >
-                {post?.user.name}
+                {post?.user?.name}
               </h4>
               <span
                 className={`text-sm sm:text-[15px] ${!postPage && 'ml-1.5'}`}
               >
-                @{post?.user.tag}
+                @{post?.user?.tag}
               </span>
             </div>
             ·{' '}
@@ -193,14 +172,13 @@ export default function Post({ id, post, postPage }: PostProps): ReactElement {
             <div className='icon group-hover:bg-[#1d9bf0] group-hover:bg-opacity-10'>
               <ChatIcon size='20px' className=' group-hover:text-[#1d9bf0]' />
             </div>
-            {comments.length > 0 && (
-              <span className='group-hover:text-[#1d9bf0] text-sm'>
-                {comments.length}
-              </span>
-            )}
+
+            <span className='group-hover:text-[#1d9bf0] text-sm'>
+              {post?._count?.comments}
+            </span>
           </div>
 
-          {session?.user?.id === post?.user.id ? (
+          {session?.user?.id === post?.user?.id ? (
             <div
               className='flex items-center space-x-1 group'
               onClick={(e) => {
@@ -238,15 +216,13 @@ export default function Post({ id, post, postPage }: PostProps): ReactElement {
                 <HeartIcon size='20px' className=' group-hover:text-pink-600' />
               )}
             </div>
-            {likes.length > 0 && (
-              <span
-                className={`group-hover:text-pink-600 text-sm ${
-                  liked && 'text-pink-600'
-                }`}
-              >
-                {likes.length}
-              </span>
-            )}
+            <span
+              className={`group-hover:text-pink-600 text-sm ${
+                liked && 'text-pink-600'
+              }`}
+            >
+              {post?._count.likes}
+            </span>
           </div>
 
           <div className='icon group'>

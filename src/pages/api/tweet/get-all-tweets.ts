@@ -11,7 +11,7 @@ import logger from '@/lib/logger';
 import { sendResponse } from '@/lib/middlewares/handle-response';
 import { withSession } from '@/lib/middlewares/with-session';
 
-import type { NextApiRequestWithUser, TweetsWithUser } from '@/types';
+import type { NextApiRequestWithUser, TweetWithUserAndCount } from '@/types';
 
 async function handler(
   req: NextApiRequestWithUser<null>,
@@ -25,6 +25,12 @@ async function handler(
         prisma.tweet.findMany({
           include: {
             user: true,
+            _count: {
+              select: {
+                comments: true,
+                likes: true,
+              },
+            },
           },
           orderBy: {
             timestamp: 'desc',
@@ -33,7 +39,7 @@ async function handler(
         prisma.tweet.count(),
       ]);
       if (totalTweets > 0) {
-        sendResponse<TweetsWithUser>({
+        sendResponse<TweetWithUserAndCount[]>({
           data: tweets,
           status: 200,
           count: totalTweets,

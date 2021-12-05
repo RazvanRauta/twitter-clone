@@ -90,6 +90,13 @@ export type TweetWithUser = Tweet & {
   user?: User;
 };
 
+export type TweetWithUserAndCount = TweetWithUser & {
+  _count: {
+    comments: number;
+    likes: number;
+  };
+};
+
 export type CommentWithUser = Comment & {
   user?: User;
 };
