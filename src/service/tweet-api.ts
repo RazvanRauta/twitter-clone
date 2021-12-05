@@ -4,10 +4,12 @@
  * @ Time: 22:30
  */
 
+import type { Comment } from '@prisma/client';
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 import type {
   ApiResponse,
+  CommentWithUser,
   TweetsWithUser,
   TweetWithComments,
   TweetWithUser,
@@ -24,6 +26,15 @@ export const tweetApi = createApi({
     }),
     getTweet: builder.query<ApiResponse<TweetWithComments>, string>({
       query: (id) => `get-tweet?id=${id}`,
+      providesTags: (data) => {
+        let id = 'tweetId';
+        if (data && data.success) {
+          if (data.data && 'id' in data.data) {
+            id = data.data.id;
+          }
+        }
+        return [{ type: 'TweetsWithUser', id }];
+      },
     }),
     createTweet: builder.mutation<ApiResponse<TweetWithUser>, TweetWithUser>({
       query: (tweet) => ({
@@ -41,6 +52,14 @@ export const tweetApi = createApi({
       }),
       invalidatesTags: ['TweetsWithUser'],
     }),
+    createComment: builder.mutation<ApiResponse<CommentWithUser>, Comment>({
+      query: (comment) => ({
+        url: 'create-comment',
+        method: 'POST',
+        body: comment,
+      }),
+      invalidatesTags: ['TweetsWithUser'],
+    }),
   }),
 });
 
@@ -49,4 +68,5 @@ export const {
   useGetTweetQuery,
   useCreateTweetMutation,
   useUpdateTweetMutation,
+  useCreateCommentMutation,
 } = tweetApi;
