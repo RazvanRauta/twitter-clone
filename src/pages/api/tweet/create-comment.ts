@@ -4,7 +4,7 @@
  * @ Time: 11:09
  */
 
-import type { Comment } from '@prisma/client';
+import type { Comment, User } from '@prisma/client';
 import { PrismaClient } from '@prisma/client';
 import type { NextApiResponse } from 'next';
 
@@ -12,11 +12,7 @@ import logger from '@/lib/logger';
 import { sendResponse } from '@/lib/middlewares/handle-response';
 import { withSession } from '@/lib/middlewares/with-session';
 
-import type {
-  CommentWithUser,
-  NextApiRequestWithUser,
-  TweetWithUser,
-} from '@/types';
+import type { NextApiRequestWithUser, TweetWithUser } from '@/types';
 
 async function handler(
   req: NextApiRequestWithUser<Comment>,
@@ -52,7 +48,7 @@ async function handler(
             user: true,
           },
         });
-        sendResponse<CommentWithUser>({
+        sendResponse<Comment & { user: User }>({
           status: 201,
           data: newComment,
           res,

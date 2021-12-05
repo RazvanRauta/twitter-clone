@@ -36,7 +36,7 @@ import {
 import NextImage from '../NextImage';
 import Spinner from '../Spinner';
 
-import type { TweetWithComments } from '@/types';
+import type { TweetWithCommentsAndCount } from '@/types';
 
 export default function Modal(): ReactElement {
   const postId = useAppSelector(getModalPostId);
@@ -48,13 +48,13 @@ export default function Modal(): ReactElement {
   const picker = useRef<HTMLDivElement>(null);
   const [showEmojis, setShowEmojis] = useState<boolean>(false);
 
-  let post: TweetWithComments | null = null;
+  let post: TweetWithCommentsAndCount | null = null;
 
   const [createComment] = useCreateCommentMutation();
   const { data, isLoading } = useGetTweetQuery(postId || '');
 
   if (data && data.success) {
-    if ('id' in data.data) post = data.data;
+    if (data.data && 'id' in data.data) post = data.data;
   }
 
   const setPostId = (id: string) => {

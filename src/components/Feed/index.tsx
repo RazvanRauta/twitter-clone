@@ -22,7 +22,7 @@ export default function Feed(): ReactElement {
   let posts: TweetWithUserAndCount[] = [];
   let errorMsj = '';
 
-  if (data && 'data' in data) {
+  if (data && 'data' in data && data.data) {
     posts = data.data;
   }
 

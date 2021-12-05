@@ -47,7 +47,7 @@ function Tweet({
   const { data, isLoading, error } = useGetTweetQuery(id as string);
 
   if (!isLoading && data && data.success) {
-    if ('id' in data.data) {
+    if (data.data && 'id' in data.data) {
       post = data.data;
     }
   }

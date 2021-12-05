@@ -16,7 +16,7 @@ import type { ApiHandler, NextApiRequestWithUser } from '@/types';
  */
 export const withSession =
   (handler: ApiHandler) =>
-  async (req: NextApiRequestWithUser, res: NextApiResponse) => {
+  async (req: NextApiRequestWithUser<unknown>, res: NextApiResponse) => {
     const session = await getSession({ req });
     if (session) {
       req.user = session.user;
