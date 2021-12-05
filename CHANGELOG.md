@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.0](https://github.com/RazvanRauta/twitter-clone/compare/v1.1.0...v1.2.0) (2021-12-05)
+
+
+### Features
+
+* **meta:** added new icons ([ca88289](https://github.com/RazvanRauta/twitter-clone/commit/ca88289c0e1d59b4da24ddbce3d5616a76d59dde))
+
+
+### Bug Fixes
+
+* remove comment ([cc0ef96](https://github.com/RazvanRauta/twitter-clone/commit/cc0ef96e546ab598565b6a30b1703eddf2c063a4))
+
 ## [1.1.0](https://github.com/RazvanRauta/twitter-clone/compare/v1.0.0...v1.1.0) (2021-12-05)
 
 
