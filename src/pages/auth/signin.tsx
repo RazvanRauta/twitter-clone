@@ -14,7 +14,9 @@ import { getProviders } from 'next-auth/react';
 import type { ReactElement } from 'react';
 import { useEffect } from 'react';
 
+import Layout from '@/components/layout/Layout';
 import { Login } from '@/components/Login';
+import Seo from '@/components/Seo';
 
 export default function SignInPage({
   providers,
@@ -28,7 +30,12 @@ export default function SignInPage({
     }
   }, [router, session]);
 
-  return <Login providers={providers} />;
+  return (
+    <Layout>
+      <Seo templateTitle='Sign In' />
+      <Login providers={providers} />{' '}
+    </Layout>
+  );
 }
 
 type GetServerSideCustomProps = {
