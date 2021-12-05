@@ -1,18 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
-import type { QueryDocumentSnapshot } from '@firebase/firestore';
-import {
-  collection,
-  deleteDoc,
-  doc,
-  onSnapshot,
-  orderBy,
-  query,
-  setDoc,
-} from '@firebase/firestore';
 import formatDistance from 'date-fns/formatDistance';
 import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/react';
 import type { ReactElement } from 'react';
+import { useCallback } from 'react';
 import React, { useEffect, useState } from 'react';
 import {
   HiHeart as HeartIconFilled,
@@ -25,29 +16,31 @@ import {
   HiOutlineTrash as TrashIcon,
 } from 'react-icons/hi';
 
-import { db } from '@/lib/firebase';
 import { useAppDispatch } from '@/lib/store-hooks';
 
+import {
+  useCreateLikeMutation,
+  useDeleteLikeMutation,
+  useDeleteTweetMutation,
+} from '@/service/tweet-api';
 import { setModalIsOpen, setModalPostId } from '@/store/modal/modalSlice';
 
 import NextImage from '../NextImage';
 
-import type { IComment, ITweet, ITweetLike } from '@/types';
+import type { TweetWithUserAndCount } from '@/types';
 
 interface PostProps {
   id: string;
-  post?: ITweet;
+  post?: TweetWithUserAndCount;
   postPage?: boolean;
 }
 
 export default function Post({ id, post, postPage }: PostProps): ReactElement {
   const { data: session } = useSession();
-
-  const [comments, setComments] = useState<QueryDocumentSnapshot<IComment>[]>(
-    []
-  );
-  const [likes, setLikes] = useState<QueryDocumentSnapshot<ITweetLike>[]>([]);
   const [liked, setLiked] = useState(false);
+  const [createLike] = useCreateLikeMutation();
+  const [deleteLike] = useDeleteLikeMutation();
+  const [deleteTweet] = useDeleteTweetMutation();
   const router = useRouter();
 
   const dispatch = useAppDispatch();
@@ -62,56 +55,45 @@ export default function Post({ id, post, postPage }: PostProps): ReactElement {
 
   useEffect(
     () =>
-      onSnapshot(
-        query(
-          collection(db, 'posts', id, 'comments'),
-          orderBy('timestamp', 'desc')
-        ),
-        (snapshot) => {
-          const comments = snapshot.docs as QueryDocumentSnapshot<IComment>[];
-          setComments(comments);
-        }
-      ),
-    [id]
-  );
-
-  useEffect(
-    () =>
-      onSnapshot(collection(db, 'posts', id, 'likes'), (snapshot) => {
-        const likes = snapshot.docs as QueryDocumentSnapshot<ITweetLike>[];
-        setLikes(likes);
-      }),
-    [id]
-  );
-
-  useEffect(
-    () =>
       setLiked(
-        likes.findIndex((like) => like.id === session?.user?.uid) !== -1
+        post
+          ? post.likes.findIndex(
+              (like) => like.user.email === session?.user?.email
+            ) !== -1
+          : false
       ),
-    [likes, session?.user?.uid]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [post?.likes, session?.user?.email]
   );
 
-  const likePost = async () => {
-    if (session?.user?.uid) {
+  const likePost = useCallback(() => {
+    if (session?.user?.email) {
+      setLiked(!liked);
       if (liked) {
-        await deleteDoc(doc(db, 'posts', id, 'likes', session?.user?.uid));
+        const like =
+          post &&
+          post.likes.find((like) => like.user.email === session?.user?.email);
+        if (like) {
+          deleteLike({ id: like.id });
+        }
       } else {
-        await setDoc(doc(db, 'posts', id, 'likes', session.user.uid), {
-          username: session?.user?.name,
-        });
+        createLike({ tweetId: id });
       }
     }
-  };
+  }, [createLike, deleteLike, id, liked, post, session?.user?.email]);
+
+  const handleDeleteTweet = useCallback(() => {
+    deleteTweet({ id });
+  }, [deleteTweet, id]);
 
   return (
     <div
       className='flex p-3 border-b border-gray-700 cursor-pointer'
       onClick={() => router.push(`/t/${id}`)}
     >
-      {!postPage && post?.userImg && (
+      {!postPage && post?.user && (
         <NextImage
-          src={post.userImg}
+          src={post.user.image || ''}
           alt='Profile Pic'
           className='mr-4'
           imgClassName='rounded-full h-11 w-11'
@@ -121,9 +103,9 @@ export default function Post({ id, post, postPage }: PostProps): ReactElement {
       )}
       <div className='flex flex-col w-full space-y-2'>
         <div className={`flex ${!postPage && 'justify-between'}`}>
-          {postPage && post?.userImg && (
+          {postPage && post?.user && (
             <NextImage
-              src={post?.userImg}
+              src={post.user.image || ''}
               alt='Profile Pic'
               className='mr-4'
               imgClassName='rounded-full h-11 w-11'
@@ -138,19 +120,19 @@ export default function Post({ id, post, postPage }: PostProps): ReactElement {
                   !postPage && 'inline-block'
                 }`}
               >
-                {post?.username}
+                {post?.user?.name}
               </h4>
               <span
                 className={`text-sm sm:text-[15px] ${!postPage && 'ml-1.5'}`}
               >
-                @{post?.tag}
+                @{post?.user?.tag}
               </span>
             </div>
             ·{' '}
             <span className='hover:underline text-sm sm:text-[15px]'>
               <time>
                 {formatDistance(
-                  new Date(post?.timestamp?.toDate() || Date.now()),
+                  new Date(post?.timestamp || Date.now()),
                   new Date(),
                   { addSuffix: true }
                 )}
@@ -172,11 +154,13 @@ export default function Post({ id, post, postPage }: PostProps): ReactElement {
         {postPage && (
           <p className='text-[#d9d9d9] mt-0.5 text-xl'>{post?.text}</p>
         )}
-        <img
-          src={post?.image}
-          alt=''
-          className='rounded-2xl max-h-[700px] object-cover mr-2'
-        />
+        {post?.image && (
+          <img
+            src={post?.image}
+            alt=''
+            className='rounded-2xl max-h-[700px] object-cover mr-2'
+          />
+        )}
         <div
           className={`text-[#6e767d] flex justify-between w-10/12 ${
             postPage && 'mx-auto'
@@ -193,20 +177,18 @@ export default function Post({ id, post, postPage }: PostProps): ReactElement {
             <div className='icon group-hover:bg-[#1d9bf0] group-hover:bg-opacity-10'>
               <ChatIcon size='20px' className=' group-hover:text-[#1d9bf0]' />
             </div>
-            {comments.length > 0 && (
-              <span className='group-hover:text-[#1d9bf0] text-sm'>
-                {comments.length}
-              </span>
-            )}
+
+            <span className='group-hover:text-[#1d9bf0] text-sm'>
+              {post?._count?.comments}
+            </span>
           </div>
 
-          {session?.user?.uid === post?.id ? (
+          {session?.user?.email === post?.user?.email ? (
             <div
               className='flex items-center space-x-1 group'
               onClick={(e) => {
                 e.stopPropagation();
-                deleteDoc(doc(db, 'posts', id));
-                router.push('/');
+                handleDeleteTweet();
               }}
             >
               <div className='icon group-hover:bg-red-600/10'>
@@ -238,15 +220,13 @@ export default function Post({ id, post, postPage }: PostProps): ReactElement {
                 <HeartIcon size='20px' className=' group-hover:text-pink-600' />
               )}
             </div>
-            {likes.length > 0 && (
-              <span
-                className={`group-hover:text-pink-600 text-sm ${
-                  liked && 'text-pink-600'
-                }`}
-              >
-                {likes.length}
-              </span>
-            )}
+            <span
+              className={`group-hover:text-pink-600 text-sm ${
+                liked && 'text-pink-600'
+              }`}
+            >
+              {post?._count.likes}
+            </span>
           </div>
 
           <div className='icon group'>

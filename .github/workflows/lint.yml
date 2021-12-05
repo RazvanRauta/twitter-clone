@@ -9,11 +9,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - uses: actions/setup-node@v2
         with:
           node-version: '14'
           cache: 'yarn'
-      - run: yarn
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ${{ github.workspace }}/.next/cache
+            **/node_modules
+            **/.eslintcache
+            ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/yarn.lock') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-${{ hashFiles('**/yarn.lock') }}
+
+      - run: yarn install --frozen-lockfile
       - run: yarn lint:strict
 
   tsc:
@@ -21,11 +37,29 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - uses: actions/setup-node@v2
         with:
           node-version: '14'
           cache: 'yarn'
-      - run: yarn
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ${{ github.workspace }}/.next/cache
+            **/node_modules
+            **/.eslintcache
+            ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/yarn.lock') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-${{ hashFiles('**/yarn.lock') }}
+
+      - run: yarn install --frozen-lockfile
+      - run: yarn run prisma:generate
       - run: yarn tsc
 
   prettier:
@@ -33,11 +67,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - uses: actions/setup-node@v2
         with:
           node-version: '14'
           cache: 'yarn'
-      - run: yarn
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ${{ github.workspace }}/.next/cache
+            **/node_modules
+            **/.eslintcache
+            ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/yarn.lock') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-${{ hashFiles('**/yarn.lock') }}
+
+      - run: yarn install --frozen-lockfile
       - run: yarn format:check
 
   test:
@@ -45,9 +96,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - uses: actions/setup-node@v2
         with:
           node-version: '14'
           cache: 'yarn'
-      - run: yarn
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ${{ github.workspace }}/.next/cache
+            **/node_modules
+            **/.eslintcache
+            ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/yarn.lock') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-${{ hashFiles('**/yarn.lock') }}
+
+      - run: yarn install --frozen-lockfile
       - run: yarn test

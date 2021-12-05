@@ -4,21 +4,13 @@
  *  Time: 18:31
  */
 
-import {
-  addDoc,
-  collection,
-  doc,
-  onSnapshot,
-  serverTimestamp,
-} from '@firebase/firestore';
 import { Dialog, Transition } from '@headlessui/react';
 import formatDistance from 'date-fns/formatDistance';
 import type { EmojiData } from 'emoji-mart';
 import { Picker } from 'emoji-mart';
 import { useRouter } from 'next/router';
-import { useSession } from 'next-auth/react';
 import type { ReactElement } from 'react';
-import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
+import { Fragment, useCallback, useRef, useState } from 'react';
 import {
   HiOutlineCalendar as CalendarIcon,
   HiOutlineChartBar as ChartBarIcon,
@@ -27,10 +19,13 @@ import {
   HiOutlineX as XIcon,
 } from 'react-icons/hi';
 
-import { db } from '@/lib/firebase';
 import { useAppDispatch, useAppSelector } from '@/lib/store-hooks';
 import useOnClickOutside from '@/lib/useOnClickOutside';
 
+import {
+  useCreateCommentMutation,
+  useGetTweetQuery,
+} from '@/service/tweet-api';
 import {
   getModalPostId,
   isModalOpen,
@@ -39,19 +34,28 @@ import {
 } from '@/store/modal/modalSlice';
 
 import NextImage from '../NextImage';
+import Spinner from '../Spinner';
 
-import type { ITweet } from '@/types';
+import type { TweetWithCommentsAndCount } from '@/types';
 
 export default function Modal(): ReactElement {
-  const { data: session } = useSession();
   const postId = useAppSelector(getModalPostId);
   const isOpen = useAppSelector(isModalOpen);
-  const [post, setPost] = useState<ITweet | undefined>();
+
   const [comment, setComment] = useState('');
   const router = useRouter();
   const dispatch = useAppDispatch();
   const picker = useRef<HTMLDivElement>(null);
   const [showEmojis, setShowEmojis] = useState<boolean>(false);
+
+  let post: TweetWithCommentsAndCount | null = null;
+
+  const [createComment] = useCreateCommentMutation();
+  const { data, isLoading } = useGetTweetQuery(postId || '');
+
+  if (data && data.success) {
+    if (data.data && 'id' in data.data) post = data.data;
+  }
 
   const setPostId = (id: string) => {
     dispatch(setModalPostId(id));
@@ -61,31 +65,22 @@ export default function Modal(): ReactElement {
     dispatch(setModalIsOpen(val));
   };
 
-  useEffect(
-    () =>
-      onSnapshot(doc(db, 'posts', postId || ''), (snapshot) => {
-        const post = snapshot.data() as ITweet;
-        setPost(post);
-      }),
-    [postId]
-  );
-
   const sendComment = async (e: React.SyntheticEvent) => {
     e.preventDefault();
 
-    await addDoc(collection(db, 'posts', postId || '', 'comments'), {
-      comment: comment,
-      username: session?.user.name,
-      tag: session?.user.tag,
-      userImg: session?.user.image,
-      timestamp: serverTimestamp(),
-    });
+    createComment({
+      comment,
+      tweetId: post?.id || '',
+      timestamp: new Date(),
+    })
+      .unwrap()
+      .then(() => {
+        setIsOpen(false);
+        setComment('');
+        setPostId('');
 
-    setIsOpen(false);
-    setComment('');
-    setPostId('');
-
-    router.push(`/t/${postId}`);
+        router.push(`/t/${postId}`);
+      });
   };
 
   const addEmoji = (emoji: EmojiData) => {
@@ -138,9 +133,9 @@ export default function Modal(): ReactElement {
                 <div className='w-full'>
                   <div className='text-[#6e767d] flex gap-x-3 relative'>
                     <span className='w-0.5 h-full z-[-1] absolute left-5 top-11 bg-gray-600' />
-                    {post?.userImg && (
+                    {post?.user?.image && (
                       <NextImage
-                        src={post?.userImg}
+                        src={post?.user?.image}
                         alt='Profile Pic'
                         className='mr-4'
                         imgClassName='rounded-full h-11 w-11'
@@ -151,17 +146,17 @@ export default function Modal(): ReactElement {
                     <div>
                       <div className='inline-block group'>
                         <h4 className='font-bold text-[#d9d9d9] inline-block text-[15px] sm:text-base'>
-                          {post?.username}
+                          {post?.user?.name}
                         </h4>
                         <span className='ml-1.5 text-sm sm:text-[15px]'>
-                          @{post?.tag}{' '}
+                          @{post?.user?.tag}{' '}
                         </span>
                       </div>{' '}
                       ·{' '}
                       <span className='hover:underline text-sm sm:text-[15px]'>
                         <time>
                           {formatDistance(
-                            new Date(post?.timestamp?.toDate() || Date.now()),
+                            new Date(post?.timestamp || Date.now()),
                             new Date(),
                             { addSuffix: true }
                           )}
@@ -171,12 +166,13 @@ export default function Modal(): ReactElement {
                         {post?.text}
                       </p>
                     </div>
+                    {isLoading && <Spinner />}
                   </div>
 
                   <div className='flex w-full space-x-3 mt-7'>
-                    {post?.userImg && (
+                    {post?.user?.image && (
                       <NextImage
-                        src={post?.userImg}
+                        src={post?.user.image}
                         alt='Profile Pic'
                         className='mr-4'
                         imgClassName='rounded-full h-11 w-11'

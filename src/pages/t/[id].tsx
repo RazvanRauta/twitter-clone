@@ -4,97 +4,67 @@
  *  Time: 12:07
  */
 
-import type { QueryDocumentSnapshot } from '@firebase/firestore';
-import {
-  collection,
-  doc,
-  onSnapshot,
-  orderBy,
-  query,
-} from '@firebase/firestore';
-import type { GetServerSideProps } from 'next';
+import type { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import { useRouter } from 'next/router';
-import type { BuiltInProviderType } from 'next-auth/providers';
-import type { ClientSafeProvider, LiteralUnion } from 'next-auth/react';
-import { getProviders, getSession, useSession } from 'next-auth/react';
+import { getSession } from 'next-auth/react';
 import type { ReactElement } from 'react';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { HiArrowLeft as ArrowLeftIcon } from 'react-icons/hi';
 
-import { db } from '@/lib/firebase';
 import { useAppSelector } from '@/lib/store-hooks';
+import { withAuth } from '@/lib/with-auth';
 
 import Comment from '@/components/Comment';
 import Layout from '@/components/layout/Layout';
-import { Login } from '@/components/Login';
 import Modal from '@/components/Modal';
 import Post from '@/components/Post';
 import Seo from '@/components/Seo';
 import SideBar from '@/components/SideBar';
+import Spinner from '@/components/Spinner';
 import { Widgets } from '@/components/Widgets';
 
 import { sideBarLinks } from '@/constants';
+import { useGetTweetQuery } from '@/service/tweet-api';
 import { isModalOpen } from '@/store/modal/modalSlice';
 
 import type {
+  ApiErrorResponse,
   FollowerResults,
-  IComment,
-  ITweet,
   TrendingResults,
+  TweetWithCommentsAndCount,
 } from '@/types';
 
-interface TweetProps {
-  trendingResults: TrendingResults;
-  followResults: FollowerResults;
-  providers: Record<
-    LiteralUnion<BuiltInProviderType, string>,
-    ClientSafeProvider
-  > | null;
-}
-
-export default function Tweet({
+function Tweet({
   followResults,
-  providers,
   trendingResults,
-}: TweetProps): ReactElement {
-  const { data: session } = useSession();
-  const [post, setPost] = useState<ITweet>();
-  const [comments, setComments] = useState<QueryDocumentSnapshot<IComment>[]>(
-    []
-  );
+}: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
   const router = useRouter();
   const isOpen = useAppSelector(isModalOpen);
   const { id } = router.query;
+  let post: TweetWithCommentsAndCount | null = null;
+  let errorMsj = '';
 
-  useEffect(
-    () =>
-      onSnapshot(doc(db, 'posts', `${id}`), (snapshot) => {
-        const post = snapshot.data() as ITweet;
-        setPost(post);
-      }),
-    [id]
-  );
+  const { data, isLoading, error } = useGetTweetQuery(id as string);
 
-  useEffect(
-    () =>
-      onSnapshot(
-        query(
-          collection(db, 'posts', `${id}`, 'comments'),
-          orderBy('timestamp', 'desc')
-        ),
-        (snapshot) => {
-          const comments = snapshot.docs as QueryDocumentSnapshot<IComment>[];
-          setComments(comments);
-        }
-      ),
-    [id]
-  );
+  if (!isLoading && data && data.success) {
+    if (data.data && 'id' in data.data) {
+      post = data.data;
+    }
+  }
 
-  if (!session) return <Login providers={providers} />;
+  if (!isLoading && error && 'data' in error) {
+    const { data: datum } = error;
+    const err = datum as ApiErrorResponse;
+    errorMsj = err && 'error' in err ? err.error : 'Ups! Error...';
+  }
+
+  if (!post) {
+    return <p>No post</p>;
+  }
 
   return (
     <Layout>
-      <Seo templateTitle={`${post?.username} on Twitter: "${post?.text}""`} />
+      <Seo templateTitle={`${post?.user?.name} on Twitter: "${post?.text}""`} />
       <main className='bg-black min-h-screen flex max-w-[1500px] mx-auto'>
         <SideBar sideBarLinks={[...sideBarLinks]} />
         <div className='flex-grow border-l border-r border-gray-700 max-w-2xl sm:ml-[73px] xl:ml-[370px]'>
@@ -107,13 +77,18 @@ export default function Tweet({
             </div>
             Tweet
           </div>
-
+          {isLoading && <Spinner />}
           <Post id={`${id}`} post={post} postPage />
-          {comments.length > 0 && (
+          {post && post?.comments && post?.comments?.length > 0 && (
             <div className='pb-72'>
-              {comments.map((comment: QueryDocumentSnapshot<IComment>) => (
-                <Comment key={comment.id} comment={comment.data()} />
+              {post.comments.map((comment) => (
+                <Comment key={comment.id} comment={comment} />
               ))}
+            </div>
+          )}
+          {errorMsj && !isLoading && (
+            <div className='flex items-center justify-center w-full h-28'>
+              <p className='text-yellow-300'>{errorMsj}</p>
             </div>
           )}
         </div>
@@ -127,21 +102,28 @@ export default function Tweet({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export default withAuth(Tweet);
+
+type GetServerSideCustomProps = {
+  trendingResults: TrendingResults;
+  followResults: FollowerResults;
+};
+
+export const getServerSideProps: GetServerSideProps<
+  GetServerSideCustomProps
+> = async (context) => {
   const trendingResults = await fetch('https://jsonkeeper.com/b/NKEV').then(
     (res) => res.json()
   );
   const followResults = await fetch('https://jsonkeeper.com/b/WWMJ').then(
     (res) => res.json()
   );
-  const providers = await getProviders();
   const session = await getSession(context);
 
   return {
     props: {
       trendingResults,
       followResults,
-      providers,
       session,
     },
   };

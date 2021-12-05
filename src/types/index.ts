@@ -4,6 +4,10 @@
  * @ Time: 16:35
  */
 import type { DocumentData, Timestamp } from '@firebase/firestore';
+import type Prisma from '@prisma/client';
+import type { Comment, Tweet, User } from '@prisma/client';
+import type { CommentLike } from '@prisma/client';
+import type { NextApiRequest, NextApiResponse, NextPage } from 'next';
 import type { IconType } from 'react-icons/lib';
 
 export interface ISideBarLink {
@@ -59,3 +63,80 @@ export interface IComment extends DocumentData {
 export interface ITweetLike extends DocumentData {
   username: string;
 }
+
+export interface NextApiRequestWithUser<T> extends NextApiRequest {
+  user?: Prisma.User;
+  body: T;
+}
+
+export type ApiHandler = (
+  req: NextApiRequest,
+  res: NextApiResponse
+) => Promise<void>;
+
+export interface ApiSuccessResponse<T = []> {
+  success: true;
+  count: number;
+  data: T | never[] | undefined;
+}
+
+export interface ApiErrorResponse {
+  success: false;
+  error: string;
+}
+
+export type ApiResponse<T = []> = ApiSuccessResponse<T> | ApiErrorResponse;
+
+export type TweetWithUser = Tweet & {
+  user?: User;
+};
+
+export type TweetWithUserAndCount = TweetWithUser & {
+  likes: {
+    user: {
+      email: string;
+    };
+    id: string;
+  }[];
+  _count: {
+    comments: number;
+    likes: number;
+  };
+};
+
+export type CommentLikeWithUser = CommentLike & {
+  user: {
+    email: string;
+  };
+};
+
+export type CommentWithUser = Comment & {
+  user?: User;
+  commentLikes: CommentLikeWithUser[];
+  _count: {
+    commentLikes: number;
+  };
+};
+
+export type TweetWithCommentsAndCount = TweetWithUser & {
+  comments?: CommentWithUser[];
+  likes: {
+    user: {
+      email: string;
+    };
+    id: string;
+  }[];
+  _count: {
+    comments: number;
+    likes: number;
+  };
+};
+
+export type TweetsWithUser = TweetWithUser[];
+
+export type NextApplicationPage<P = unknown, IP = P> = NextPage<P, IP> & {
+  requireAuth?: boolean;
+};
+
+export type AtLeastOne<T, U = { [K in keyof T]: Pick<T, K> }> = Partial<T> &
+  U[keyof U];

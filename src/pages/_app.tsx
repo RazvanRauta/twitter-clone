@@ -10,13 +10,21 @@ import { Provider } from 'react-redux';
 
 import '@/styles/globals.css';
 
+import { AuthGuard } from '@/components/AuthGuard';
+
 import { store } from '@/store';
 
 function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
   return (
     <Provider store={store}>
       <SessionProvider session={session}>
-        <Component {...pageProps} />
+        {Component.requireAuth ? (
+          <AuthGuard>
+            <Component {...pageProps} />
+          </AuthGuard>
+        ) : (
+          <Component {...pageProps} />
+        )}
       </SessionProvider>
     </Provider>
   );
