@@ -3,14 +3,13 @@
  * @ Date: Dec 02 2021
  * @ Time: 22:30
  */
-
-import type { Comment } from '@prisma/client';
+import type { Comment, CommentLike, Like } from '@prisma/client';
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 import type {
   ApiResponse,
   CommentWithUser,
-  TweetWithComments,
+  TweetWithCommentsAndCount,
   TweetWithUser,
   TweetWithUserAndCount,
 } from '@/types';
@@ -24,7 +23,7 @@ export const tweetApi = createApi({
       query: () => `get-all-tweets`,
       providesTags: () => ['TweetsWithUser'],
     }),
-    getTweet: builder.query<ApiResponse<TweetWithComments>, string>({
+    getTweet: builder.query<ApiResponse<TweetWithCommentsAndCount>, string>({
       query: (id) => `get-tweet?id=${id}`,
       providesTags: (data) => {
         let id = 'tweetId';
@@ -36,7 +35,10 @@ export const tweetApi = createApi({
         return [{ type: 'TweetsWithUser', id }];
       },
     }),
-    createTweet: builder.mutation<ApiResponse<TweetWithUser>, TweetWithUser>({
+    createTweet: builder.mutation<
+      ApiResponse<TweetWithUser>,
+      Omit<TweetWithUser, 'image' | 'userId' | 'id'>
+    >({
       query: (tweet) => ({
         url: 'create-tweet',
         method: 'POST',
@@ -52,11 +54,74 @@ export const tweetApi = createApi({
       }),
       invalidatesTags: ['TweetsWithUser'],
     }),
-    createComment: builder.mutation<ApiResponse<CommentWithUser>, Comment>({
+    createComment: builder.mutation<
+      ApiResponse<CommentWithUser>,
+      Omit<Comment, 'userId' | 'id'>
+    >({
       query: (comment) => ({
         url: 'create-comment',
         method: 'POST',
         body: comment,
+      }),
+      invalidatesTags: ['TweetsWithUser'],
+    }),
+    createLike: builder.mutation<
+      ApiResponse<Like>,
+      Omit<Like, 'id' | 'userId'>
+    >({
+      query: (like) => ({
+        url: 'create-like',
+        method: 'POST',
+        body: like,
+      }),
+      invalidatesTags: ['TweetsWithUser'],
+    }),
+    createCommentLike: builder.mutation<
+      ApiResponse<CommentLike>,
+      Omit<CommentLike, 'id' | 'userId'>
+    >({
+      query: (commentLike) => ({
+        url: 'create-comment-like',
+        method: 'POST',
+        body: commentLike,
+      }),
+      invalidatesTags: ['TweetsWithUser'],
+    }),
+    deleteLike: builder.mutation<ApiResponse<null>, Pick<Like, 'id'>>({
+      query: (like) => ({
+        url: 'delete-like',
+        method: 'DELETE',
+        body: like,
+      }),
+      invalidatesTags: ['TweetsWithUser'],
+    }),
+    deleteComment: builder.mutation<ApiResponse<null>, Pick<Comment, 'id'>>({
+      query: (comment) => ({
+        url: 'delete-comment',
+        method: 'DELETE',
+        body: comment,
+      }),
+      invalidatesTags: ['TweetsWithUser'],
+    }),
+    deleteCommentLike: builder.mutation<
+      ApiResponse<null>,
+      Pick<CommentLike, 'id'>
+    >({
+      query: (commentLike) => ({
+        url: 'delete-comment-like',
+        method: 'DELETE',
+        body: commentLike,
+      }),
+      invalidatesTags: ['TweetsWithUser'],
+    }),
+    deleteTweet: builder.mutation<
+      ApiResponse<null>,
+      Pick<TweetWithUserAndCount, 'id'>
+    >({
+      query: (tweet) => ({
+        url: 'delete-tweet',
+        method: 'DELETE',
+        body: tweet,
       }),
       invalidatesTags: ['TweetsWithUser'],
     }),
@@ -69,4 +134,10 @@ export const {
   useCreateTweetMutation,
   useUpdateTweetMutation,
   useCreateCommentMutation,
+  useCreateLikeMutation,
+  useCreateCommentLikeMutation,
+  useDeleteLikeMutation,
+  useDeleteTweetMutation,
+  useDeleteCommentLikeMutation,
+  useDeleteCommentMutation,
 } = tweetApi;

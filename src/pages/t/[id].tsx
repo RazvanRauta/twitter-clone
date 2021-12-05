@@ -31,7 +31,7 @@ import type {
   ApiErrorResponse,
   FollowerResults,
   TrendingResults,
-  TweetWithComments,
+  TweetWithCommentsAndCount,
 } from '@/types';
 
 function Tweet({
@@ -41,7 +41,7 @@ function Tweet({
   const router = useRouter();
   const isOpen = useAppSelector(isModalOpen);
   const { id } = router.query;
-  let post: TweetWithComments | null = null;
+  let post: TweetWithCommentsAndCount | null = null;
   let errorMsj = '';
 
   const { data, isLoading, error } = useGetTweetQuery(id as string);

@@ -25,6 +25,16 @@ async function handler(
         prisma.tweet.findMany({
           include: {
             user: true,
+            likes: {
+              select: {
+                user: {
+                  select: {
+                    email: true,
+                  },
+                },
+                id: true,
+              },
+            },
             _count: {
               select: {
                 comments: true,

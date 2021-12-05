@@ -11,7 +11,10 @@ import logger from '@/lib/logger';
 import { sendResponse } from '@/lib/middlewares/handle-response';
 import { withSession } from '@/lib/middlewares/with-session';
 
-import type { NextApiRequestWithUser, TweetWithComments } from '@/types';
+import type {
+  NextApiRequestWithUser,
+  TweetWithCommentsAndCount,
+} from '@/types';
 
 async function handler(
   req: NextApiRequestWithUser<null>,
@@ -29,6 +32,39 @@ async function handler(
           comments: {
             include: {
               user: true,
+              commentLikes: {
+                include: {
+                  user: {
+                    select: {
+                      email: true,
+                    },
+                  },
+                },
+              },
+              _count: {
+                select: {
+                  commentLikes: true,
+                },
+              },
+            },
+            orderBy: {
+              timestamp: 'desc',
+            },
+          },
+          likes: {
+            select: {
+              user: {
+                select: {
+                  email: true,
+                },
+              },
+              id: true,
+            },
+          },
+          _count: {
+            select: {
+              comments: true,
+              likes: true,
             },
           },
         },
@@ -37,7 +73,7 @@ async function handler(
         },
       });
       if (tweet) {
-        sendResponse<TweetWithComments>({
+        sendResponse<TweetWithCommentsAndCount>({
           data: tweet,
           status: 200,
           count: 1,

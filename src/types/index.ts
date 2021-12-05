@@ -6,6 +6,7 @@
 import type { DocumentData, Timestamp } from '@firebase/firestore';
 import type Prisma from '@prisma/client';
 import type { Comment, Tweet, User } from '@prisma/client';
+import type { CommentLike } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse, NextPage } from 'next';
 import type { IconType } from 'react-icons/lib';
 
@@ -76,7 +77,7 @@ export type ApiHandler = (
 export interface ApiSuccessResponse<T = []> {
   success: true;
   count: number;
-  data: T | never[];
+  data: T | never[] | undefined;
 }
 
 export interface ApiErrorResponse {
@@ -91,18 +92,44 @@ export type TweetWithUser = Tweet & {
 };
 
 export type TweetWithUserAndCount = TweetWithUser & {
+  likes: {
+    user: {
+      email: string;
+    };
+    id: string;
+  }[];
   _count: {
     comments: number;
     likes: number;
   };
 };
 
-export type CommentWithUser = Comment & {
-  user?: User;
+export type CommentLikeWithUser = CommentLike & {
+  user: {
+    email: string;
+  };
 };
 
-export type TweetWithComments = TweetWithUser & {
+export type CommentWithUser = Comment & {
+  user?: User;
+  commentLikes: CommentLikeWithUser[];
+  _count: {
+    commentLikes: number;
+  };
+};
+
+export type TweetWithCommentsAndCount = TweetWithUser & {
   comments?: CommentWithUser[];
+  likes: {
+    user: {
+      email: string;
+    };
+    id: string;
+  }[];
+  _count: {
+    comments: number;
+    likes: number;
+  };
 };
 
 export type TweetsWithUser = TweetWithUser[];

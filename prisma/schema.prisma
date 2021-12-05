@@ -13,8 +13,12 @@ datasource db {
 model CommentLike {
   id        String @id @default(cuid())
   commentId String @map("comment_id")
+  userId    String @map("user_id")
+
 
   comment Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
 
   @@map("commentLikes")
 }
@@ -95,6 +99,7 @@ model User {
 
 
   @@map("users")
+  CommentLike CommentLike[]
 }
 
 model Session {

@@ -6,15 +6,24 @@
 
 import type { Comment } from '@prisma/client';
 import formatDistance from 'date-fns/formatDistance';
+import { useSession } from 'next-auth/react';
 import type { ReactElement } from 'react';
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
+  HiHeart as HeartIconFilled,
   HiOutlineChartBar as ChartBarIcon,
   HiOutlineChat as ChatIcon,
   HiOutlineDotsHorizontal as DotsHorizontalIcon,
   HiOutlineHeart as HeartIcon,
   HiOutlineShare as ShareIcon,
+  HiOutlineTrash as TrashIcon,
 } from 'react-icons/hi';
+
+import {
+  useCreateCommentLikeMutation,
+  useDeleteCommentLikeMutation,
+  useDeleteCommentMutation,
+} from '@/service/tweet-api';
 
 import NextImage from '../NextImage';
 
@@ -25,6 +34,47 @@ interface Props {
 }
 
 export default function Comment({ comment }: Props): ReactElement {
+  const { data: session } = useSession();
+  const [liked, setLiked] = useState(false);
+  const [createLike] = useCreateCommentLikeMutation();
+  const [deleteLike] = useDeleteCommentLikeMutation();
+  const [deleteComment] = useDeleteCommentMutation();
+
+  useEffect(
+    () =>
+      setLiked(
+        comment
+          ? comment.commentLikes.findIndex(
+              (like) => like.user.email === session?.user?.email
+            ) !== -1
+          : false
+      ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [comment?.commentLikes, session?.user?.email]
+  );
+
+  const likeComment = useCallback(() => {
+    if (session?.user?.email) {
+      setLiked(!liked);
+      if (liked) {
+        const like =
+          comment &&
+          comment.commentLikes.find(
+            (like) => like.user.email === session?.user?.email
+          );
+        if (like) {
+          deleteLike({ id: like.id });
+        }
+      } else {
+        createLike({ commentId: comment.id });
+      }
+    }
+  }, [comment, createLike, deleteLike, liked, session?.user?.email]);
+
+  const handleDeleteComment = useCallback(() => {
+    deleteComment({ id: comment.id });
+  }, [comment, deleteComment]);
+
   return (
     <div className='flex p-3 border-b border-gray-700 cursor-pointer'>
       {comment?.user?.image && (
@@ -75,11 +125,41 @@ export default function Comment({ comment }: Props): ReactElement {
             <ChatIcon size='20px' className=' group-hover:text-[#1d9bf0]' />
           </div>
 
-          <div className='flex items-center space-x-1 group'>
-            <div className='icon group-hover:bg-pink-600/10'>
-              <HeartIcon size='20px' className=' group-hover:text-pink-600' />
+          {session?.user?.email === comment?.user?.email && (
+            <div
+              className='flex items-center space-x-1 group'
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDeleteComment();
+              }}
+            >
+              <div className='icon group-hover:bg-red-600/10'>
+                <TrashIcon size='20px' className=' group-hover:text-red-600' />
+              </div>
             </div>
-            <span className='text-sm group-hover:text-pink-600'></span>
+          )}
+
+          <div
+            className='flex items-center space-x-1 group'
+            onClick={(e) => {
+              e.stopPropagation();
+              likeComment();
+            }}
+          >
+            <div className='icon group-hover:bg-pink-600/10'>
+              {liked ? (
+                <HeartIconFilled size='20px' className='text-pink-600 ' />
+              ) : (
+                <HeartIcon size='20px' className=' group-hover:text-pink-600' />
+              )}
+            </div>
+            <span
+              className={`group-hover:text-pink-600 text-sm ${
+                liked && 'text-pink-600'
+              }`}
+            >
+              {comment?._count.commentLikes}
+            </span>
           </div>
 
           <div className='icon group'>

@@ -9,7 +9,6 @@ import formatDistance from 'date-fns/formatDistance';
 import type { EmojiData } from 'emoji-mart';
 import { Picker } from 'emoji-mart';
 import { useRouter } from 'next/router';
-import { useSession } from 'next-auth/react';
 import type { ReactElement } from 'react';
 import { Fragment, useCallback, useRef, useState } from 'react';
 import {
@@ -40,7 +39,6 @@ import Spinner from '../Spinner';
 import type { TweetWithComments } from '@/types';
 
 export default function Modal(): ReactElement {
-  const { data: session } = useSession();
   const postId = useAppSelector(getModalPostId);
   const isOpen = useAppSelector(isModalOpen);
 
@@ -73,9 +71,7 @@ export default function Modal(): ReactElement {
     createComment({
       comment,
       tweetId: post?.id || '',
-      userId: session?.user?.id || '',
       timestamp: new Date(),
-      id: '',
     })
       .unwrap()
       .then(() => {

@@ -12,14 +12,14 @@ type SendResponseProps<T> = {
   res: NextApiResponse<ApiResponse<T>>;
   status: number;
   error?: string;
-  data?: T | never[];
+  data?: T;
   count?: number;
 };
 
 export const sendResponse = <T = []>({
   res,
   status,
-  data = [],
+  data,
   count = 0,
   error,
 }: SendResponseProps<T>): void => {
@@ -36,6 +36,9 @@ export const sendResponse = <T = []>({
     res.json({ success: false, error });
     res.end();
   } else {
-    res.json({ success: true, count, data });
+    if (status !== 204) {
+      res.json({ success: true, count, data });
+    }
+    res.end();
   }
 };

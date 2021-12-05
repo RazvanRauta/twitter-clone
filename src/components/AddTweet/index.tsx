@@ -73,9 +73,6 @@ export default function AddTweet(): ReactElement {
     const newTweetResponse = await createTweet({
       text: input,
       timestamp: new Date(),
-      userId: session.user.id,
-      id: '',
-      image: '',
     }).unwrap();
 
     if (selectedFile && newTweetResponse && newTweetResponse.success) {

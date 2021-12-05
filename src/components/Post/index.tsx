@@ -1,16 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
-import type { QueryDocumentSnapshot } from '@firebase/firestore';
-import {
-  collection,
-  deleteDoc,
-  doc,
-  onSnapshot,
-  setDoc,
-} from '@firebase/firestore';
 import formatDistance from 'date-fns/formatDistance';
 import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/react';
 import type { ReactElement } from 'react';
+import { useCallback } from 'react';
 import React, { useEffect, useState } from 'react';
 import {
   HiHeart as HeartIconFilled,
@@ -23,14 +16,18 @@ import {
   HiOutlineTrash as TrashIcon,
 } from 'react-icons/hi';
 
-import { db } from '@/lib/firebase';
 import { useAppDispatch } from '@/lib/store-hooks';
 
+import {
+  useCreateLikeMutation,
+  useDeleteLikeMutation,
+  useDeleteTweetMutation,
+} from '@/service/tweet-api';
 import { setModalIsOpen, setModalPostId } from '@/store/modal/modalSlice';
 
 import NextImage from '../NextImage';
 
-import type { ITweetLike, TweetWithUserAndCount } from '@/types';
+import type { TweetWithUserAndCount } from '@/types';
 
 interface PostProps {
   id: string;
@@ -40,8 +37,10 @@ interface PostProps {
 
 export default function Post({ id, post, postPage }: PostProps): ReactElement {
   const { data: session } = useSession();
-  const [likes, setLikes] = useState<QueryDocumentSnapshot<ITweetLike>[]>([]);
   const [liked, setLiked] = useState(false);
+  const [createLike] = useCreateLikeMutation();
+  const [deleteLike] = useDeleteLikeMutation();
+  const [deleteTweet] = useDeleteTweetMutation();
   const router = useRouter();
 
   const dispatch = useAppDispatch();
@@ -56,30 +55,36 @@ export default function Post({ id, post, postPage }: PostProps): ReactElement {
 
   useEffect(
     () =>
-      onSnapshot(collection(db, 'posts', id, 'likes'), (snapshot) => {
-        const likes = snapshot.docs as QueryDocumentSnapshot<ITweetLike>[];
-        setLikes(likes);
-      }),
-    [id]
+      setLiked(
+        post
+          ? post.likes.findIndex(
+              (like) => like.user.email === session?.user?.email
+            ) !== -1
+          : false
+      ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [post?.likes, session?.user?.email]
   );
 
-  useEffect(
-    () =>
-      setLiked(likes.findIndex((like) => like.id === session?.user?.id) !== -1),
-    [likes, session?.user?.id]
-  );
-
-  const likePost = async () => {
-    if (session?.user?.id) {
+  const likePost = useCallback(() => {
+    if (session?.user?.email) {
+      setLiked(!liked);
       if (liked) {
-        await deleteDoc(doc(db, 'posts', id, 'likes', session?.user?.id));
+        const like =
+          post &&
+          post.likes.find((like) => like.user.email === session?.user?.email);
+        if (like) {
+          deleteLike({ id: like.id });
+        }
       } else {
-        await setDoc(doc(db, 'posts', id, 'likes', session.user.id), {
-          username: session?.user?.name,
-        });
+        createLike({ tweetId: id });
       }
     }
-  };
+  }, [createLike, deleteLike, id, liked, post, session?.user?.email]);
+
+  const handleDeleteTweet = useCallback(() => {
+    deleteTweet({ id });
+  }, [deleteTweet, id]);
 
   return (
     <div
@@ -178,13 +183,12 @@ export default function Post({ id, post, postPage }: PostProps): ReactElement {
             </span>
           </div>
 
-          {session?.user?.id === post?.user?.id ? (
+          {session?.user?.email === post?.user?.email ? (
             <div
               className='flex items-center space-x-1 group'
               onClick={(e) => {
                 e.stopPropagation();
-                deleteDoc(doc(db, 'posts', id));
-                router.push('/');
+                handleDeleteTweet();
               }}
             >
               <div className='icon group-hover:bg-red-600/10'>
