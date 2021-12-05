@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.1.0](https://github.com/RazvanRauta/twitter-clone/compare/v1.0.0...v1.1.0) (2021-12-05)
+
+
+### Features
+
+* **api:** added new endpoints ([9299326](https://github.com/RazvanRauta/twitter-clone/commit/9299326db6d50e04b126631d01994c13305a6604))
+* **api:** added withSession middleware ([a67f986](https://github.com/RazvanRauta/twitter-clone/commit/a67f986478ad547916fb953b8da99a50f028442d))
+* **api:** get comments and likes count ([476ef32](https://github.com/RazvanRauta/twitter-clone/commit/476ef323e9f0c9d32328a8caa8030771904da375))
+* **api:** updated endpoints ([659d2b7](https://github.com/RazvanRauta/twitter-clone/commit/659d2b717efde26563d8d723fcd3cf40386681ca))
+* **auth:** added schema for accounts and users ([9f971db](https://github.com/RazvanRauta/twitter-clone/commit/9f971db5621dd198158db11ccb973f4734157633))
+* **auth:** auth guard ([e9aebd0](https://github.com/RazvanRauta/twitter-clone/commit/e9aebd0587f5ce4018c93e34474fab460d83ad5b))
+* **auth:** save user tag in DB ([898c72d](https://github.com/RazvanRauta/twitter-clone/commit/898c72d607f5181e65a34889e200c136edecee38))
+* **backend:** added endpoints for tweets ([8c2cbed](https://github.com/RazvanRauta/twitter-clone/commit/8c2cbed0deb760963901b8d9b645ace1518061f1))
+* **backend:** implemented tweets api ([1f5d657](https://github.com/RazvanRauta/twitter-clone/commit/1f5d6572322433c520ed9603ea8a6d1c105936fc))
+* **prisma:** added prisma schema for PostgreSql ([784ee18](https://github.com/RazvanRauta/twitter-clone/commit/784ee185f14dc348f6c36ce0e58c1bce0101179d))
+* **prisma:** added prisma scripts ([53bdb18](https://github.com/RazvanRauta/twitter-clone/commit/53bdb187b12b3e3fd93586ded95bcb895a407e8d))
+* **tweet:** added create tweet mutation ([b3e3b38](https://github.com/RazvanRauta/twitter-clone/commit/b3e3b383ccdd5d2321202fe804b7cb10298706f6))
+* **vomments:** added comments endpoint ([e9fdab0](https://github.com/RazvanRauta/twitter-clone/commit/e9fdab034b5626791d99dd0147b726fd313bc6fd))
+
+
+### Bug Fixes
+
+* fixed tsc errors ([685ae16](https://github.com/RazvanRauta/twitter-clone/commit/685ae16f5ecdf6b5d3147a7620bb1f7ae058f8bc))
+* tsc error ([6ae34df](https://github.com/RazvanRauta/twitter-clone/commit/6ae34df7040e698792d4c6d144896a02debc9cc3))
+
 ## 1.0.0 (2021-12-01)
 
 ### Features
