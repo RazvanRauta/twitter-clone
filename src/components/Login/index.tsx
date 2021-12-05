@@ -35,7 +35,7 @@ export const Login = ({ providers }: LoginProps): ReactElement => {
       <div>
         {providers &&
           Object.values(providers).map((provider) => (
-            <div key={provider.name}>
+            <div key={provider.name} className='pb-5'>
               {/* https://devdojo.com/tailwindcss/buttons#_ */}
               <button
                 className='relative inline-flex items-center justify-start px-6 py-3 overflow-hidden font-medium transition-all bg-white rounded hover:bg-white group'
