@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.3.1](https://github.com/RazvanRauta/twitter-clone/compare/v1.3.0...v1.3.1) (2021-12-05)
+
+
+### Bug Fixes
+
+* **meta:** fixed meta on sign in page ([3491e5a](https://github.com/RazvanRauta/twitter-clone/commit/3491e5aa08fab1a6f3535164de74e9ef9375c98c))
+
 ## [1.3.0](https://github.com/RazvanRauta/twitter-clone/compare/v1.2.0...v1.3.0) (2021-12-05)
 
 
