@@ -6,7 +6,8 @@ import { openGraph } from '@/lib/helper';
 const defaultMeta = {
   title: 'Twitter Clone with Next.js + Tailwind CSS + TypeScript',
   siteName: 'Twitter Clone with Next.js + Tailwind CSS + TypeScript',
-  description: 'A Twitter Clone with Next.js + Tailwind CSS + TypeScript',
+  description:
+    'A Full Stack app made with Next.js + Tailwind CSS + TypeScript + Prisma + Supabase',
   url: 'https://twitter.rrazvan.dev',
   image: '',
   type: 'website',
