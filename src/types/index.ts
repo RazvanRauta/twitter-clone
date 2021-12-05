@@ -5,7 +5,7 @@
  */
 import type { DocumentData, Timestamp } from '@firebase/firestore';
 import type Prisma from '@prisma/client';
-import type { Tweet, User } from '@prisma/client';
+import type { Comment, Tweet, User } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse, NextPage } from 'next';
 import type { IconType } from 'react-icons/lib';
 
@@ -63,8 +63,9 @@ export interface ITweetLike extends DocumentData {
   username: string;
 }
 
-export interface NextApiRequestWithUser extends NextApiRequest {
+export interface NextApiRequestWithUser<T> extends NextApiRequest {
   user?: Prisma.User;
+  body: T;
 }
 
 export type ApiHandler = (
@@ -73,20 +74,28 @@ export type ApiHandler = (
 ) => Promise<void>;
 
 export interface ApiSuccessResponse<T = []> {
-  success: boolean;
+  success: true;
   count: number;
   data: T | never[];
 }
 
 export interface ApiErrorResponse {
-  success: boolean;
+  success: false;
   error: string;
 }
 
 export type ApiResponse<T = []> = ApiSuccessResponse<T> | ApiErrorResponse;
 
 export type TweetWithUser = Tweet & {
-  user: User;
+  user?: User;
+};
+
+export type CommentWithUser = Comment & {
+  user?: User;
+};
+
+export type TweetWithComments = TweetWithUser & {
+  comments?: CommentWithUser[];
 };
 
 export type TweetsWithUser = TweetWithUser[];
@@ -94,3 +103,6 @@ export type TweetsWithUser = TweetWithUser[];
 export type NextApplicationPage<P = unknown, IP = P> = NextPage<P, IP> & {
   requireAuth?: boolean;
 };
+
+export type AtLeastOne<T, U = { [K in keyof T]: Pick<T, K> }> = Partial<T> &
+  U[keyof U];

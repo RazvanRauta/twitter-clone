@@ -4,16 +4,13 @@
  *  Time: 12:07
  */
 
-import type { QueryDocumentSnapshot } from '@firebase/firestore';
-import { collection, onSnapshot, orderBy, query } from '@firebase/firestore';
 import type { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import { useRouter } from 'next/router';
 import { getSession } from 'next-auth/react';
 import type { ReactElement } from 'react';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { HiArrowLeft as ArrowLeftIcon } from 'react-icons/hi';
 
-import { db } from '@/lib/firebase';
 import { useAppSelector } from '@/lib/store-hooks';
 import { withAuth } from '@/lib/with-auth';
 
@@ -23,54 +20,43 @@ import Modal from '@/components/Modal';
 import Post from '@/components/Post';
 import Seo from '@/components/Seo';
 import SideBar from '@/components/SideBar';
+import Spinner from '@/components/Spinner';
 import { Widgets } from '@/components/Widgets';
 
 import { sideBarLinks } from '@/constants';
+import { useGetTweetQuery } from '@/service/tweet-api';
 import { isModalOpen } from '@/store/modal/modalSlice';
 
 import type {
+  ApiErrorResponse,
   FollowerResults,
-  IComment,
   TrendingResults,
-  TweetWithUser,
+  TweetWithComments,
 } from '@/types';
 
 function Tweet({
   followResults,
   trendingResults,
 }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [post, setPost] = useState<TweetWithUser>();
-  const [comments, setComments] = useState<QueryDocumentSnapshot<IComment>[]>(
-    []
-  );
   const router = useRouter();
   const isOpen = useAppSelector(isModalOpen);
   const { id } = router.query;
+  let post: TweetWithComments | null = null;
+  let errorMsj = '';
 
-  // useEffect(
-  //   () =>
-  //     onSnapshot(doc(db, 'posts', `${id}`), (snapshot) => {
-  //       const post = snapshot.data() as ITweet;
-  //       setPost(post);
-  //     }),
-  //   [id]
-  // );
+  const { data, isLoading, error } = useGetTweetQuery(id as string);
 
-  useEffect(
-    () =>
-      onSnapshot(
-        query(
-          collection(db, 'posts', `${id}`, 'comments'),
-          orderBy('timestamp', 'desc')
-        ),
-        (snapshot) => {
-          const comments = snapshot.docs as QueryDocumentSnapshot<IComment>[];
-          setComments(comments);
-        }
-      ),
-    [id]
-  );
+  if (!isLoading && data && data.success) {
+    if ('id' in data.data) {
+      post = data.data;
+    }
+  }
+
+  if (!isLoading && error && 'data' in error) {
+    const { data: datum } = error;
+    const err = datum as ApiErrorResponse;
+    errorMsj = err && 'error' in err ? err.error : 'Ups! Error...';
+  }
 
   if (!post) {
     return <p>No post</p>;
@@ -78,7 +64,7 @@ function Tweet({
 
   return (
     <Layout>
-      <Seo templateTitle={`${post.user.name} on Twitter: "${post?.text}""`} />
+      <Seo templateTitle={`${post?.user?.name} on Twitter: "${post?.text}""`} />
       <main className='bg-black min-h-screen flex max-w-[1500px] mx-auto'>
         <SideBar sideBarLinks={[...sideBarLinks]} />
         <div className='flex-grow border-l border-r border-gray-700 max-w-2xl sm:ml-[73px] xl:ml-[370px]'>
@@ -91,13 +77,18 @@ function Tweet({
             </div>
             Tweet
           </div>
-
+          {isLoading && <Spinner />}
           <Post id={`${id}`} post={post} postPage />
-          {comments.length > 0 && (
+          {post && post?.comments && post?.comments?.length > 0 && (
             <div className='pb-72'>
-              {comments.map((comment: QueryDocumentSnapshot<IComment>) => (
-                <Comment key={comment.id} comment={comment.data()} />
+              {post.comments.map((comment) => (
+                <Comment key={comment.id} comment={comment} />
               ))}
+            </div>
+          )}
+          {errorMsj && !isLoading && (
+            <div className='flex items-center justify-center w-full h-28'>
+              <p className='text-yellow-300'>{errorMsj}</p>
             </div>
           )}
         </div>

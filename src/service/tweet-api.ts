@@ -6,7 +6,12 @@
 
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
-import type { ApiResponse, TweetsWithUser, TweetWithUser } from '@/types';
+import type {
+  ApiResponse,
+  TweetsWithUser,
+  TweetWithComments,
+  TweetWithUser,
+} from '@/types';
 
 export const tweetApi = createApi({
   reducerPath: 'tweets',
@@ -17,7 +22,10 @@ export const tweetApi = createApi({
       query: () => `get-all-tweets`,
       providesTags: () => ['TweetsWithUser'],
     }),
-    createTweet: builder.mutation<TweetWithUser, TweetWithUser>({
+    getTweet: builder.query<ApiResponse<TweetWithComments>, string>({
+      query: (id) => `get-tweet?id=${id}`,
+    }),
+    createTweet: builder.mutation<ApiResponse<TweetWithUser>, TweetWithUser>({
       query: (tweet) => ({
         url: 'create-tweet',
         method: 'POST',
@@ -25,7 +33,20 @@ export const tweetApi = createApi({
       }),
       invalidatesTags: ['TweetsWithUser'],
     }),
+    updateTweet: builder.mutation<ApiResponse<TweetWithUser>, TweetWithUser>({
+      query: (tweet) => ({
+        url: 'update-tweet',
+        method: 'PATCH',
+        body: tweet,
+      }),
+      invalidatesTags: ['TweetsWithUser'],
+    }),
   }),
 });
 
-export const { useGetAllTweetsQuery, useCreateTweetMutation } = tweetApi;
+export const {
+  useGetAllTweetsQuery,
+  useGetTweetQuery,
+  useCreateTweetMutation,
+  useUpdateTweetMutation,
+} = tweetApi;

@@ -11,7 +11,7 @@ import logger from '@/lib/logger';
 import { sendResponse } from '@/lib/middlewares/handle-response';
 import { withSession } from '@/lib/middlewares/with-session';
 
-import type { NextApiRequestWithUser, TweetsWithUser } from '@/types';
+import type { NextApiRequestWithUser, TweetWithComments } from '@/types';
 
 async function handler(
   req: NextApiRequestWithUser<null>,
@@ -19,40 +19,44 @@ async function handler(
 ) {
   const prisma = new PrismaClient();
 
+  const { id } = req.query;
+
   if (req.method === 'GET') {
     try {
-      const [tweets, totalTweets] = await prisma.$transaction([
-        prisma.tweet.findMany({
-          include: {
-            user: true,
+      const tweet = await prisma.tweet.findFirst({
+        include: {
+          user: true,
+          comments: {
+            include: {
+              user: true,
+            },
           },
-          orderBy: {
-            timestamp: 'desc',
-          },
-        }),
-        prisma.tweet.count(),
-      ]);
-      if (totalTweets > 0) {
-        sendResponse<TweetsWithUser>({
-          data: tweets,
+        },
+        where: {
+          id: id as string,
+        },
+      });
+      if (tweet) {
+        sendResponse<TweetWithComments>({
+          data: tweet,
           status: 200,
-          count: totalTweets,
+          count: 1,
           res,
         });
       } else {
         sendResponse({
-          error: 'No tweets were found',
+          error: `No tweet was found with id: ${id}`,
           status: 404,
           res,
         });
       } // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       logger.error(
-        '\n\n⚠️⚠️⚠️⚠️----Error while fetching all the tweets----⚠️⚠️⚠️⚠️⚠️\n\n',
+        `\n\n⚠️⚠️⚠️⚠️----Error while fetching tweet with id: ${id}----⚠️⚠️⚠️⚠️⚠️\n\n`,
         error
       );
       sendResponse({
-        error: error.message || 'Error while fetching all the tweets',
+        error: error.message || `Error while fetching tweet with id: ${id}`,
         status: 404,
         res,
       });

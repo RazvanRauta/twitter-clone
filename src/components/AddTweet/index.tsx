@@ -1,11 +1,4 @@
 /* eslint-disable @next/next/no-img-element */
-import {
-  addDoc,
-  collection,
-  doc,
-  serverTimestamp,
-  updateDoc,
-} from '@firebase/firestore';
 import { getDownloadURL, ref, uploadString } from '@firebase/storage';
 import clsx from 'clsx';
 import type { EmojiData } from 'emoji-mart';
@@ -26,8 +19,13 @@ import {
 import 'emoji-mart/css/emoji-mart.css';
 import styles from './styles.module.css';
 
-import { db, storage } from '@/lib/firebase';
+import { storage } from '@/lib/firebase';
 import useOnClickOutside from '@/lib/useOnClickOutside';
+
+import {
+  useCreateTweetMutation,
+  useUpdateTweetMutation,
+} from '@/service/tweet-api';
 
 import NextImage from '../NextImage';
 
@@ -39,6 +37,9 @@ export default function AddTweet(): ReactElement {
   const filePickerRef = useRef<HTMLInputElement>(null);
   const picker = useRef<HTMLDivElement>(null);
   const [showEmojis, setShowEmojis] = useState<boolean>(false);
+
+  const [createTweet] = useCreateTweetMutation();
+  const [updateTweet] = useUpdateTweetMutation();
 
   const addImageToPost = (e: SyntheticEvent<HTMLInputElement>) => {
     const reader = new FileReader();
@@ -69,29 +70,30 @@ export default function AddTweet(): ReactElement {
 
     setLoading(true);
 
-    const docRef = await addDoc(collection(db, 'posts'), {
-      username: session.user?.name,
-      userImg: session.user?.image,
-      tag: session.user?.tag,
+    const newTweetResponse = await createTweet({
       text: input,
-      timestamp: serverTimestamp(),
-    });
+      timestamp: new Date(),
+      userId: session.user.id,
+      id: '',
+      image: '',
+    }).unwrap();
 
-    const imageRef = ref(storage, `posts/${docRef.id}/image`);
-
-    if (selectedFile) {
-      try {
-        await uploadString(imageRef, selectedFile, 'data_url').then(
-          async () => {
-            const downloadURL = await getDownloadURL(imageRef);
-            await updateDoc(doc(db, 'posts', docRef.id), {
-              image: downloadURL,
-            });
-          }
-        );
-      } catch (e) {
-        // eslint-disable-next-line no-console
-        console.error(e);
+    if (selectedFile && newTweetResponse && newTweetResponse.success) {
+      const { data } = newTweetResponse;
+      if (data && 'id' in data) {
+        ///upload picture to firestore than updated the tweet.
+        const imageRef = ref(storage, `posts/${data.id}/image`);
+        try {
+          await uploadString(imageRef, selectedFile, 'data_url').then(
+            async () => {
+              const downloadURL = await getDownloadURL(imageRef);
+              await updateTweet({ ...data, image: downloadURL }).unwrap();
+            }
+          );
+        } catch (e) {
+          // eslint-disable-next-line no-console
+          console.error(e);
+        }
       }
     }
 

@@ -4,6 +4,7 @@
  *  Time: 12:20
  */
 
+import type { Comment } from '@prisma/client';
 import formatDistance from 'date-fns/formatDistance';
 import type { ReactElement } from 'react';
 import React from 'react';
@@ -17,18 +18,18 @@ import {
 
 import NextImage from '../NextImage';
 
-import type { IComment } from '@/types';
+import type { CommentWithUser } from '@/types';
 
 interface Props {
-  comment: IComment;
+  comment: CommentWithUser;
 }
 
 export default function Comment({ comment }: Props): ReactElement {
   return (
     <div className='flex p-3 border-b border-gray-700 cursor-pointer'>
-      {comment?.userImg && (
+      {comment?.user?.image && (
         <NextImage
-          src={comment.userImg}
+          src={comment.user.image}
           alt='Profile Pic'
           className='mr-4'
           imgClassName='rounded-full h-11 w-11'
@@ -41,17 +42,17 @@ export default function Comment({ comment }: Props): ReactElement {
           <div className='text-[#6e767d]'>
             <div className='inline-block group'>
               <h4 className='font-bold text-[#d9d9d9] text-[15px] sm:text-base inline-block group-hover:underline'>
-                {comment?.username}
+                {comment?.user?.name}
               </h4>
               <span className='ml-1.5 text-sm sm:text-[15px]'>
-                @{comment?.tag}{' '}
+                @{comment?.user?.tag}{' '}
               </span>
             </div>{' '}
             ·{' '}
             <span className='hover:underline text-sm sm:text-[15px]'>
               <time>
                 {formatDistance(
-                  new Date(comment?.timestamp?.toDate() || Date.now()),
+                  new Date(comment?.timestamp || Date.now()),
                   new Date(),
                   { addSuffix: true }
                 )}

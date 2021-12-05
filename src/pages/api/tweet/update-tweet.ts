@@ -1,7 +1,7 @@
 /**
  * @ @author: Razvan Rauta
  * @ Date: Dec 04 2021
- * @ Time: 11:09
+ * @ Time: 14:55
  */
 
 import type { Tweet } from '@prisma/client';
@@ -27,18 +27,14 @@ async function handler(
       res,
     });
   } else {
-    if (req.method === 'POST') {
+    if (req.method === 'PATCH') {
       try {
-        const newTweet = await prisma.tweet.create({
+        const updatedTweet = await prisma.tweet.update({
+          where: {
+            id: req.body.id,
+          },
           data: {
-            text: req.body.text,
-            image: req.body.image,
-            timestamp: req.body.timestamp,
-            user: {
-              connect: {
-                email: user.email,
-              },
-            },
+            image: req.body?.image,
           },
           include: {
             user: true,
@@ -46,19 +42,19 @@ async function handler(
         });
         sendResponse<TweetWithUser>({
           status: 201,
-          data: newTweet,
+          data: updatedTweet,
           res,
         });
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         logger.error(
-          '\n\n⚠️⚠️⚠️⚠️----Error while creating a new tweet----⚠️⚠️⚠️⚠️⚠️\n\n',
+          '\n\n⚠️⚠️⚠️⚠️----Error while updating a tweet----⚠️⚠️⚠️⚠️⚠️\n\n',
           error
         );
 
         sendResponse<TweetWithUser>({
           status: 400,
-          error: error.message || 'Error while creating a new tweet',
+          error: error.message || 'Error while updating a tweet',
           res,
         });
       }
