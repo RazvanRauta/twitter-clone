@@ -111,6 +111,7 @@ export default function AddTweet(): ReactElement {
         imgClassName='rounded-full cursor-pointer'
         width={44}
         height={44}
+        title={session?.user.name || ''}
       />
       <div className='w-full divide-y divide-gray-700'>
         <div className={clsx(selectedFile && 'pb-7', input && 'space-y-2.5')}>
@@ -145,7 +146,11 @@ export default function AddTweet(): ReactElement {
                 className='icon'
                 onClick={() => filePickerRef?.current?.click()}
               >
-                <HiOutlinePhotograph className='text-[#1d9bf0]' size='22px' />
+                <HiOutlinePhotograph
+                  className='text-[#1d9bf0]'
+                  size='22px'
+                  title='Media'
+                />
                 <input
                   type='file'
                   accept='image/jpeg,image/png,image/webp,image/gif,video/mp4,video/quicktime,video/webm'
@@ -156,15 +161,27 @@ export default function AddTweet(): ReactElement {
               </div>
 
               <div className='rotate-90 icon'>
-                <HiOutlineChartBar className='text-[#1d9bf0]' size='22px' />
+                <HiOutlineChartBar
+                  className='text-[#1d9bf0]'
+                  size='22px'
+                  title='Pool'
+                />
               </div>
 
               <div className='icon' onClick={() => setShowEmojis(!showEmojis)}>
-                <HiOutlineEmojiHappy className='text-[#1d9bf0]' size='22px' />
+                <HiOutlineEmojiHappy
+                  className='text-[#1d9bf0]'
+                  size='22px'
+                  title='Emoji'
+                />
               </div>
 
               <div className='icon'>
-                <HiOutlineCalendar className='text-[#1d9bf0]' size='22px' />
+                <HiOutlineCalendar
+                  className='text-[#1d9bf0]'
+                  size='22px'
+                  title='Schedule'
+                />
               </div>
               <div ref={picker} className='absolute z-10'>
                 {showEmojis && (

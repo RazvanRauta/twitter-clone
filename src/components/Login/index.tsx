@@ -4,10 +4,12 @@
  *  Time: 18:28
  */
 
+import { useRouter } from 'next/router';
 import type { BuiltInProviderType } from 'next-auth/providers';
 import type { ClientSafeProvider, LiteralUnion } from 'next-auth/react';
 import { signIn } from 'next-auth/react';
 import type { ReactElement } from 'react';
+import { useEffect, useState } from 'react';
 import React from 'react';
 
 import styles from './styles.module.css';
@@ -22,6 +24,17 @@ type LoginProps = {
 };
 
 export const Login = ({ providers }: LoginProps): ReactElement => {
+  const { query } = useRouter();
+  const [isError, setIsError] = useState(false);
+
+  useEffect(() => {
+    if (query && query.error) {
+      setIsError(true);
+    } else if (isError) {
+      setIsError(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query]);
   return (
     <div className={styles['login-container']}>
       <NextImage
@@ -48,6 +61,13 @@ export const Login = ({ providers }: LoginProps): ReactElement => {
               </button>
             </div>
           ))}
+        {isError && (
+          <div className='flex items-center justify-center w-48 p-2 text-center bg-red-500 rounded'>
+            <p className='text-red-100'>
+              Try signing in with a different account.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

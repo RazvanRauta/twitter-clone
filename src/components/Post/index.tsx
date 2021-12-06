@@ -7,7 +7,6 @@ import { useCallback } from 'react';
 import React, { useEffect, useState } from 'react';
 import {
   HiHeart as HeartIconFilled,
-  HiOutlineChartBar as ChartBarIcon,
   HiOutlineChat as ChatIcon,
   HiOutlineDotsHorizontal as DotsHorizontalIcon,
   HiOutlineHeart as HeartIcon,
@@ -38,6 +37,7 @@ interface PostProps {
 export default function Post({ id, post, postPage }: PostProps): ReactElement {
   const { data: session } = useSession();
   const [liked, setLiked] = useState(false);
+  const [likesCount, setLikesCount] = useState(0);
   const [createLike] = useCreateLikeMutation();
   const [deleteLike] = useDeleteLikeMutation();
   const [deleteTweet] = useDeleteTweetMutation();
@@ -54,14 +54,17 @@ export default function Post({ id, post, postPage }: PostProps): ReactElement {
   };
 
   useEffect(
-    () =>
+    () => {
       setLiked(
         post
           ? post.likes.findIndex(
               (like) => like.user.email === session?.user?.email
             ) !== -1
           : false
-      ),
+      );
+
+      setLikesCount(post ? post._count.likes : 0);
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [post?.likes, session?.user?.email]
   );
@@ -99,6 +102,7 @@ export default function Post({ id, post, postPage }: PostProps): ReactElement {
           imgClassName='rounded-full h-11 w-11'
           width={44}
           height={44}
+          title={post.user.name || ''}
         />
       )}
       <div className='flex flex-col w-full space-y-2'>
@@ -175,7 +179,11 @@ export default function Post({ id, post, postPage }: PostProps): ReactElement {
             }}
           >
             <div className='icon group-hover:bg-[#1d9bf0] group-hover:bg-opacity-10'>
-              <ChatIcon size='20px' className=' group-hover:text-[#1d9bf0]' />
+              <ChatIcon
+                size='20px'
+                className=' group-hover:text-[#1d9bf0]'
+                title='Reply'
+              />
             </div>
 
             <span className='group-hover:text-[#1d9bf0] text-sm'>
@@ -192,7 +200,11 @@ export default function Post({ id, post, postPage }: PostProps): ReactElement {
               }}
             >
               <div className='icon group-hover:bg-red-600/10'>
-                <TrashIcon size='20px' className=' group-hover:text-red-600' />
+                <TrashIcon
+                  size='20px'
+                  className=' group-hover:text-red-600'
+                  title='Delete'
+                />
               </div>
             </div>
           ) : (
@@ -201,6 +213,7 @@ export default function Post({ id, post, postPage }: PostProps): ReactElement {
                 <SwitchHorizontalIcon
                   size='20px'
                   className=' group-hover:text-green-500'
+                  title='Retweet'
                 />
               </div>
             </div>
@@ -215,9 +228,17 @@ export default function Post({ id, post, postPage }: PostProps): ReactElement {
           >
             <div className='icon group-hover:bg-pink-600/10'>
               {liked ? (
-                <HeartIconFilled size='20px' className='text-pink-600 ' />
+                <HeartIconFilled
+                  size='20px'
+                  className='text-pink-600 '
+                  title='Unlike'
+                />
               ) : (
-                <HeartIcon size='20px' className=' group-hover:text-pink-600' />
+                <HeartIcon
+                  size='20px'
+                  className=' group-hover:text-pink-600'
+                  title='Like'
+                />
               )}
             </div>
             <span
@@ -225,15 +246,16 @@ export default function Post({ id, post, postPage }: PostProps): ReactElement {
                 liked && 'text-pink-600'
               }`}
             >
-              {post?._count.likes}
+              {likesCount}
             </span>
           </div>
 
           <div className='icon group'>
-            <ShareIcon size='20px' className=' group-hover:text-[#1d9bf0]' />
-          </div>
-          <div className='icon group'>
-            <ChartBarIcon size='20px' className=' group-hover:text-[#1d9bf0]' />
+            <ShareIcon
+              size='20px'
+              className=' group-hover:text-[#1d9bf0]'
+              title='Share'
+            />
           </div>
         </div>
       </div>

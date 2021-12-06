@@ -15,6 +15,9 @@ const prisma = new Prisma.PrismaClient();
 export default NextAuth({
   // Configure one or more authentication providers
   secret: process.env.NEXTAUTH_SECRET,
+  pages: {
+    signIn: '/auth/signin',
+  },
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,

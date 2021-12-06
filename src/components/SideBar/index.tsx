@@ -50,6 +50,7 @@ export default function SideBar({ sideBarLinks }: ISideBarProps): ReactElement {
       <button className={styles['tweet-button']}>Tweet</button>
       <div
         className={styles['profile-details-container']}
+        title='Sign Out'
         onClick={() => signOut()}
       >
         <NextImage
