@@ -9,6 +9,7 @@ import formatDistance from 'date-fns/formatDistance';
 import type { EmojiData } from 'emoji-mart';
 import { Picker } from 'emoji-mart';
 import { useRouter } from 'next/router';
+import { useSession } from 'next-auth/react';
 import type { ReactElement } from 'react';
 import { Fragment, useCallback, useRef, useState } from 'react';
 import {
@@ -41,6 +42,7 @@ import type { TweetWithCommentsAndCount } from '@/types';
 export default function Modal(): ReactElement {
   const postId = useAppSelector(getModalPostId);
   const isOpen = useAppSelector(isModalOpen);
+  const { data: session } = useSession();
 
   const [comment, setComment] = useState('');
   const router = useRouter();
@@ -170,9 +172,9 @@ export default function Modal(): ReactElement {
                   </div>
 
                   <div className='flex w-full space-x-3 mt-7'>
-                    {post?.user?.image && (
+                    {session?.user?.image && (
                       <NextImage
-                        src={post?.user.image}
+                        src={session?.user.image}
                         alt='Profile Pic'
                         className='mr-4'
                         imgClassName='rounded-full h-11 w-11'
